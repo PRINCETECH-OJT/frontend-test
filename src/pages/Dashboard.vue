@@ -1,8 +1,15 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
-const router = useRouter();
+const auth = useAuthStore()
+const router = useRouter()
+
+const handleLogout = async () => {
+  await auth.logout()
+  router.push('/login')
+} 
 
 // 1. DEFINING THE DATA
 const studentInfo = ref({
@@ -62,10 +69,7 @@ const assignments = ref([
     statusColor: "text-green-600 bg-green-50",
   },
 ]);
-
-const handleLogout = () => {
-  router.push("/");
-};
+ 
 </script>
 
 <template>

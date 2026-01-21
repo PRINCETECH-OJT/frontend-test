@@ -1,26 +1,32 @@
 <script setup>
-import { useRoute } from "vue-router";
+import { useAuthStore } from './stores/auth'
+import { useRouter } from "vue-router";
+ 
+const auth = useAuthStore() 
+const router = useRouter() 
 
-// Get access to the current route information
-const route = useRoute();
+const logout = async () => {
+  await auth.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
   <div class="app-container">
-    <nav v-if="!route.meta.hideNavbar">
+    <nav>
       <router-link to="/">Home</router-link> |
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/dashboard">Dashboard</router-link>
+      <router-link v-if="!auth.isLoggedIn" to="/login">Login</router-link>
+      <router-link v-if="auth.isLoggedIn" to="/dashboard">Dashboard</router-link>
+      <button v-if="auth.isLoggedIn" @click="logout">Logout</button>
     </nav>
 
-    <hr v-if="!route.meta.hideNavbar" />
+    <hr />
 
     <router-view />
   </div>
 </template>
 
-<style>
-/* Your existing styles... */
+<style> 
 .app-container {
   font-family: Arial, sans-serif;
   text-align: center;

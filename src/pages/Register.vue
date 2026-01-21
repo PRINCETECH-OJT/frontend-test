@@ -51,49 +51,36 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div
-    class="flex min-h-screen flex-col justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-50 px-6 py-12 lg:px-8"
-  >
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <div
-        class="mx-auto h-12 w-12 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-8 h-8 text-white"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z"
-          />
-        </svg>
-      </div>
-      <h2
-        class="mt-6 text-center text-3xl font-extrabold leading-9 tracking-tight text-gray-900"
-      >
-        Create an account
-      </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
-        Start your 14-day free trial
-      </p>
-    </div>
-
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-      <div class="bg-white px-6 py-12 shadow-2xl sm:rounded-2xl sm:px-12">
-        <form class="space-y-6" @submit.prevent="handleRegister">
-          <div
-            v-if="errorMessage"
-            class="rounded-md bg-red-50 p-4 border border-red-200"
+  <div class="register-page">
+    <div class="register-container">
+      <div class="register-header">
+        <div class="icon-container">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="icon"
           >
-            <div class="flex">
-              <div class="flex-shrink-0">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z"
+            />
+          </svg>
+        </div>
+        <h2 class="register-title">Create an account</h2>
+        <p class="register-subtitle">Start your 14-day free trial</p>
+      </div>
+
+      <div class="register-form-wrapper">
+        <div class="register-form-card">
+          <form @submit.prevent="handleRegister" class="register-form">
+            <div v-if="errorMessage" class="error-message">
+              <div class="error-content">
                 <svg
-                  class="h-5 w-5 text-red-400"
+                  class="error-icon"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
@@ -104,96 +91,70 @@ const handleRegister = async () => {
                     clip-rule="evenodd"
                   />
                 </svg>
-              </div>
-              <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">
-                  {{ errorMessage }}
-                </h3>
+                <h3 class="error-text">{{ errorMessage }}</h3>
               </div>
             </div>
-          </div>
 
-          <div>
-            <label
-              for="name"
-              class="block text-sm font-medium leading-6 text-gray-900"
-              >Full Name</label
-            >
-            <div class="mt-2">
+            <div class="form-group">
+              <label for="name" class="form-label">Full Name</label>
               <input
                 v-model="name"
                 id="name"
                 name="name"
                 type="text"
                 required
-                class="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="form-input"
+                placeholder="Enter your full name"
               />
             </div>
-          </div>
 
-          <div>
-            <label
-              for="email"
-              class="block text-sm font-medium leading-6 text-gray-900"
-              >Email address</label
-            >
-            <div class="mt-2">
+            <div class="form-group">
+              <label for="email" class="form-label">Email address</label>
               <input
                 v-model="email"
                 id="email"
                 name="email"
                 type="email"
                 required
-                class="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="form-input"
+                placeholder="Enter your email"
               />
             </div>
-          </div>
 
-          <div>
-            <label
-              for="password"
-              class="block text-sm font-medium leading-6 text-gray-900"
-              >Password</label
-            >
-            <div class="mt-2">
+            <div class="form-group">
+              <label for="password" class="form-label">Password</label>
               <input
                 v-model="password"
                 id="password"
                 name="password"
                 type="password"
                 required
-                class="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="form-input"
+                placeholder="Enter your password"
               />
             </div>
-          </div>
 
-          <div>
-            <label
-              for="confirm-password"
-              class="block text-sm font-medium leading-6 text-gray-900"
-              >Confirm Password</label
-            >
-            <div class="mt-2">
+            <div class="form-group">
+              <label for="confirm-password" class="form-label">Confirm Password</label>
               <input
                 v-model="confirmPassword"
                 id="confirm-password"
                 name="confirm-password"
                 type="password"
                 required
-                class="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                class="form-input"
+                placeholder="Confirm your password"
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               :disabled="isLoading"
-              class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition duration-150 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
+              class="submit-button"
             >
               <svg
                 v-if="isLoading"
-                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                class="spinner"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -215,18 +176,359 @@ const handleRegister = async () => {
               <span v-if="isLoading">Creating account...</span>
               <span v-else>Sign up</span>
             </button>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
 
-      <p class="mt-10 text-center text-sm text-gray-500">
-        Already have an account?
-        <router-link
-          to="/"
-          class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-          >Sign in</router-link
-        >
-      </p>
+        <p class="register-footer">
+          Already have an account?
+          <router-link to="/login" class="register-link">Sign in</router-link>
+        </p>
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.register-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #e0e7ff, #f3e8ff, #d1fae5);
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.register-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.icon-container {
+  margin: 0 auto 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.register-title {
+  margin: 0 0 8px 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.025em;
+}
+
+.register-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.register-form-wrapper {
+  width: 100%;
+}
+
+.register-form-card {
+  background: white;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.error-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.error-icon {
+  width: 20px;
+  height: 20px;
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.error-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #991b1b;
+  word-wrap: break-word;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  line-height: 1.5;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #111827;
+  background-color: white;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.submit-button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-sizing: border-box;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.submit-button:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.register-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.register-link {
+  font-weight: 600;
+  color: #4f46e5;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.register-link:hover {
+  color: #4338ca;
+  text-decoration: underline;
+}
+
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .register-form-card {
+    padding: 40px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .register-page {
+    padding: 20px 12px;
+  }
+
+  .register-header {
+    margin-bottom: 24px;
+  }
+
+  .register-title {
+    font-size: 24px;
+  }
+
+  .register-subtitle {
+    font-size: 13px;
+  }
+
+  .register-form-card {
+    padding: 32px 24px;
+    border-radius: 12px;
+  }
+
+  .register-form {
+    gap: 20px;
+  }
+
+  .icon-container {
+    width: 44px;
+    height: 44px;
+  }
+
+  .icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .register-page {
+    padding: 16px 12px;
+    min-height: 100vh;
+  }
+
+  .register-header {
+    margin-bottom: 20px;
+  }
+
+  .icon-container {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .register-title {
+    font-size: 22px;
+  }
+
+  .register-subtitle {
+    font-size: 12px;
+  }
+
+  .register-form-card {
+    padding: 24px 20px;
+    border-radius: 10px;
+  }
+
+  .register-form {
+    gap: 18px;
+  }
+
+  .form-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .submit-button {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .register-footer {
+    font-size: 13px;
+    margin-top: 20px;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+  .register-page {
+    padding: 16px;
+  }
+
+  .register-header {
+    margin-bottom: 16px;
+  }
+
+  .icon-container {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 8px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .register-title {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .register-subtitle {
+    font-size: 11px;
+  }
+
+  .register-form-card {
+    padding: 24px;
+  }
+
+  .register-form {
+    gap: 16px;
+  }
+}
+</style>

@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+/* Global reset to remove default browser spacing (fixes white borders around full-page views) */
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

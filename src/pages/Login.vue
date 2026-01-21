@@ -1,13 +1,20 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useAuthStore } from '../stores/auth' 
+import { useAuthStore } from "../stores/auth";
 
-const auth = useAuthStore()
+import coverImg from "../assets/loginCoverPage.png";
+import ustpLogo from "../assets/ustplogo.png";
+import usernameIcon from "../assets/icons/username icon.png";
+import passwordIcon from "../assets/icons/password icon.png";
+
+const auth = useAuthStore();
 const router = useRouter();
 
 const username = ref("");
 const password = ref("");
+const rememberMe = ref(false);
+const showPassword = ref(false);
 
 const isLoading = ref(false);
 const errorMessage = ref("");
@@ -15,197 +22,180 @@ const errorMessage = ref("");
 const handleLogin = async () => {
   errorMessage.value = "";
   isLoading.value = true;
-
-  try {
-    const response = await auth.login(username.value, password.value)
-    console.log("Login successful:", response);
-
+  
+  // Bypass login - set mock user and navigate to dashboard
+  auth.user = { id: 1, name: "Test User", email: "test@example.com" };
+  setTimeout(() => {
     router.push("/dashboard");
-  } catch (error) {
-    console.error("Login error:", error);
-
-    if (error.response?.status === 422) {
-      errorMessage.value = "Invalid credentials. Please try again.";
-    } else if (error.response?.data?.message) {
-      errorMessage.value = error.response.data.message;
-    } else {
-      errorMessage.value = "Network error or server is unreachable.";
-    }
-  } finally {
     isLoading.value = false;
-  }
+  }, 300);
 };
 </script>
 
 <template>
-  <div
-    class="flex min-h-screen flex-col justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-50 px-6 py-12 lg:px-8"
-  >
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <div
-        class="mx-auto h-12 w-12 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-8 h-8 text-white"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-          />
-        </svg>
-      </div>
-      <h2
-        class="mt-6 text-center text-3xl font-extrabold leading-9 tracking-tight text-gray-900"
-      >
-        Sign in to your account
-      </h2>
-    </div>
+  <div class="min-h-screen w-full bg-white">
+    <div class="flex min-h-screen flex-col lg:flex-row">
+      <!-- Left: Login -->
+      <section class="flex w-full items-center justify-center bg-white px-6 py-12 sm:px-10 lg:w-[560px] lg:px-16">
+        <div class="w-full max-w-md">
+          
+          <div class="mb-10 flex items-center gap-3">
+            <img :src="ustpLogo" alt="USTP" class="h-24 w-24 rounded-xl" />
+          </div>
+          <h1 class="text-center text-3xl font-extrabold tracking-tight text-slate-900">
+            Welcome Back
+          </h1>
+          <p class="mt-3 text-center text-sm text-slate-500">
+            Please enter your credentials to access your account
+          </p>
 
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-      <div class="bg-white px-6 py-12 shadow-2xl sm:rounded-2xl sm:px-12">
-        <form class="space-y-6" @submit.prevent="handleLogin">
           <div
             v-if="errorMessage"
-            class="rounded-md bg-red-50 p-4 border border-red-200"
+            class="mt-6 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800"
+            role="alert"
           >
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-5 w-5 text-red-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+            {{ errorMessage }}
+          </div>
+
+          <form class="mt-10 space-y-6" @submit.prevent="handleLogin">
+            <div>
+              <label class="block text-sm font-semibold text-slate-800">
+                Student / Faculty ID
+              </label>
+              <div class="relative mt-2">
+                <img
+                  :src="usernameIcon"
+                  alt=""
                   aria-hidden="true"
+                  class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 opacity-60"
+                />
+                <input
+                  v-model="username"
+                  type="text"
+                  autocomplete="username"
+                  placeholder="e.g. 2023100456"
+                  required
+                  class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-slate-800">Password</label>
+              <div class="relative mt-2">
+                <img
+                  :src="passwordIcon"
+                  alt=""
+                  aria-hidden="true"
+                  class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 opacity-60"
+                />
+                <input
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  placeholder="••••••••"
+                  required
+                  class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-12 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                />
+                <button
+                  type="button"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                  @click="showPassword = !showPassword"
                 >
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
+                  <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                    <path d="M12 5c-7.633 0-11 7-11 7s3.367 7 11 7 11-7 11-7-3.367-7-11-7Zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z"/>
+                    <path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
+                  </svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                    <path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l2.04 2.04C2.52 7.22 1 10 1 10s3.367 7 11 7c2.06 0 3.78-.48 5.22-1.18l2.25 2.25a.75.75 0 1 0 1.06-1.06l-17-17Z"/>
+                    <path d="M12 5c-1.74 0-3.27.36-4.58.9l2.11 2.11A4.99 4.99 0 0 1 12 7a5 5 0 0 1 5 5c0 .85-.21 1.65-.58 2.36l1.8 1.8C21.06 14.67 23 10 23 10s-3.367-7-11-7Z"/>
+                    <path d="M9.88 10.94a2.25 2.25 0 0 0 3.18 3.18l-3.18-3.18Z"/>
+                  </svg>
+                </button>
               </div>
-              <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">
-                  {{ errorMessage }}
-                </h3>
-              </div>
             </div>
-          </div>
 
-          <div>
-            <label
-              for="username"
-              class="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Username
-            </label>
-            <div class="mt-2">
-              <input
-                v-model="username"
-                id="username"
-                name="username"
-                type="text"
-                autocomplete="username"
-                required
-                class="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              for="password"
-              class="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Password
-            </label>
-            <div class="mt-2">
-              <input
-                v-model="password"
-                id="password"
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                required
-                class="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
-              />
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-              />
-              <label
-                for="remember-me"
-                class="ml-3 block text-sm leading-6 text-gray-900"
-              >
+            <div class="flex items-center justify-between gap-4 text-sm">
+              <label class="inline-flex items-center gap-2 text-slate-600">
+                <input
+                  v-model="rememberMe"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
+                />
                 Remember me
               </label>
-            </div>
-
-            <div class="text-sm leading-6">
-              <a
-                href="#"
-                class="font-semibold text-indigo-600 hover:text-indigo-500"
-              >
+              <a href="#" class="font-semibold text-blue-600 hover:text-blue-700">
                 Forgot password?
               </a>
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               :disabled="isLoading"
-              class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition duration-150 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
+              class="mt-2 flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-70"
             >
               <svg
                 v-if="isLoading"
-                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                class="h-5 w-5 animate-spin"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
-              <span v-if="isLoading">Signing in...</span>
-              <span v-else>Sign in</span>
+              <span>Login to Portal</span>
+              <span class="text-base leading-none">→</span>
             </button>
-          </div>
-        </form>
-      </div>
 
-      <p class="mt-10 text-center text-sm text-gray-500">
-        Don't have an account?
-        <router-link
-          to="/register"
-          class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-        >
-          Sign up
-        </router-link>
-      </p>
+            <div class="pt-8">
+              <div class="flex items-center gap-3 text-xs font-semibold text-slate-400">
+                <div class="h-px flex-1 bg-slate-200"></div>
+                SECURITY NOTICE
+                <div class="h-px flex-1 bg-slate-200"></div>
+              </div>
+
+              <div class="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-400">
+                <span class="inline-flex items-center gap-2">
+                  <span class="h-2 w-2 rounded-full bg-slate-300"></span>
+                  English (US)
+                </span>
+                <span class="inline-flex items-center gap-2">
+                  <span class="h-2 w-2 rounded-full bg-slate-300"></span>
+                  Support
+                </span>
+                <span class="inline-flex items-center gap-2">
+                  <span class="h-2 w-2 rounded-full bg-slate-300"></span>
+                  Privacy
+                </span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right: Cover -->
+      <section class="relative hidden flex-1 overflow-hidden lg:block">
+        <img :src="coverImg" alt="" class="absolute inset-0 h-full w-full object-cover" />
+        <div class="absolute inset-0 bg-blue-600/55 mix-blend-multiply"></div>
+
+        <div class="relative flex h-full flex-col items-center justify-end px-10 pb-28 text-center text-white">
+          
+
+          <h2 class="text-5xl font-extrabold leading-tight tracking-tight">
+            "Advancing a Sustainable Future"<br />
+          </h2>
+
+          <p class="mt-6 max-w-xl text-lg text-white/90">
+            Access your student profile, grades, and faculty resources in one unified platform.
+          </p>
+
+          <p class="absolute bottom-8 left-0 right-0 text-center text-sm text-white/80">
+            © 2024 University of Science and Technology of Southern Philippines
+          </p>
+        </div>
+      </section>
     </div>
   </div>
 </template>

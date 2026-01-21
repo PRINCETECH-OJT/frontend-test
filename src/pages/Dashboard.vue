@@ -11,11 +11,9 @@ const mobileMenuOpen = ref(false)
 const handleLogout = async () => {
   try {
     await auth.logout()
-  } catch (error) {
-    // If logout fails, clear user anyway
+  } catch (error) { 
     auth.user = null
-  }
-  router.push('/login')
+  } 
 }
 
 // Student data

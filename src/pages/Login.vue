@@ -8,12 +8,10 @@ import ustpLogo from "../assets/ustplogo.png";
 import usernameIcon from "../assets/icons/username icon.png";
 import passwordIcon from "../assets/icons/password icon.png";
 
-const auth = useAuthStore();
-const router = useRouter();
+const auth = useAuthStore(); 
 
 const username = ref("");
-const password = ref("");
-const rememberMe = ref(false);
+const password = ref(""); 
 const showPassword = ref(false);
 
 const isLoading = ref(false);
@@ -22,13 +20,21 @@ const errorMessage = ref("");
 const handleLogin = async () => {
   errorMessage.value = "";
   isLoading.value = true;
-  
-  // Bypass login - set mock user and navigate to dashboard
-  auth.user = { id: 1, name: "Test User", email: "test@example.com" };
-  setTimeout(() => {
-    router.push("/dashboard");
+
+  try {
+    await auth.login(username.value, password.value); 
+  } catch (error) {
+    // ✅ normalize axios / laravel errors
+    if (error.response?.data?.message) {
+      errorMessage.value = error.response.data.message;
+    } else if (error.response?.data?.errors) {
+      errorMessage.value = Object.values(error.response.data.errors)[0][0];
+    } else {
+      errorMessage.value = "Login failed. Please try again.";
+    }
+  } finally {
     isLoading.value = false;
-  }, 300);
+  }
 };
 </script>
 

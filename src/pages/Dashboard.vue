@@ -3,18 +3,10 @@ import { ref } from "vue";
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import ustpLogo from '../assets/ustplogo1.png'
+import SideBar from "../components/sidebar.vue";
 
-const auth = useAuthStore()
-const router = useRouter()
-const mobileMenuOpen = ref(false)
-
-const handleLogout = async () => {
-  try {
-    await auth.logout()
-  } catch (error) { 
-    auth.user = null
-  } 
-}
+const auth = useAuthStore() 
+const mobileMenuOpen = ref(false) 
 
 // Student data
 const studentInfo = ref({
@@ -98,7 +90,7 @@ const newsItems = ref([
 </script>
 
 <template>
-  <div class="h-screen bg-gray-50 overflow-hidden">
+  <div class="flex h-screen bg-gray-50 overflow-hidden">
     <!-- Mobile Menu Toggle -->
     <button 
       @click="mobileMenuOpen = !mobileMenuOpen"
@@ -121,8 +113,10 @@ const newsItems = ref([
     ></div>
 
     <div class="flex h-screen">
-      <!-- Left Sidebar -->
-      <aside 
+      <!-- Left Sidebar --> 
+      <SideBar />
+
+      <!-- <aside 
         :class="[
           'fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 lg:translate-x-0',
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
@@ -178,7 +172,7 @@ const newsItems = ref([
             Logout
           </button>
         </div>
-      </aside>
+      </aside> -->
 
       <!-- Main Content Area -->
       <div class="flex-1 flex flex-col min-w-0">
@@ -239,7 +233,7 @@ const newsItems = ref([
           <div class="max-w-7xl mx-auto px-6 py-8">
             <!-- Welcome Section -->
             <div class="mb-8">
-              <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, Alex!</h1>
+              <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, {{ auth.user?.username || 'User' }}!</h1>
               <p class="text-gray-600">
                 Today is {{ currentDate }}. You have <span class="font-semibold text-blue-600">3 classes</span> today.
               </p>

@@ -6,13 +6,16 @@ import { useAuthStore } from "../stores/auth";
 import {
   HomeIcon,
   UsersIcon,
-  BookOpenIcon,
-  CalendarIcon,
-  AcademicCapIcon,
-  Cog6ToothIcon,
   UserGroupIcon,
+  BuildingLibraryIcon, 
+  BuildingOfficeIcon,
+  Cog6ToothIcon,
+  BookOpenIcon,
+  AcademicCapIcon,
+  CalendarIcon,
+  UserCircleIcon,
   ArrowLeftOnRectangleIcon,
-} from "@heroicons/vue/24/outline";
+} from "@heroicons/vue/24/outline"; 
 
 /* Optional: allow parent to control mobile sidebar */
 defineProps({
@@ -29,10 +32,15 @@ const authStore = useAuthStore();
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: HomeIcon, roles: ["all"] },
   { name: "Users", path: "/users", icon: UsersIcon, roles: ["admin", "super_admin"] },
-  { name: "Groups", path: "/groups", icon: UserGroupIcon, roles: ["admin"] },
+  { name: "Roles & Perm", path: "/roles", icon: UserGroupIcon, roles: ["admin"] },
+  { name: "Campuses", path: "/campuses", icon: BuildingLibraryIcon, roles: ["admin", "super_admin"] },
+  { name: "Colleges", path: "/colleges", icon: BuildingOfficeIcon, roles: ["admin", "super_admin"] },
+  { name: "Departments", path: "/departments", icon: Cog6ToothIcon, roles: ["admin", "instructor"] },
+  { name: "Curricula", path: "/curricula", icon: BookOpenIcon, roles: ["admin", "super_admin"] },
+  { name: "Courses", path: "/courses", icon: BookOpenIcon, roles: ["admin", "super_admin"] },
+  { name: "Students", path: "/students", icon: UserCircleIcon, roles: ["admin", "super_admin"] },
   { name: "My Classes", path: "/classes", icon: AcademicCapIcon, roles: ["student", "instructor"] },
   { name: "Schedule", path: "/schedule", icon: CalendarIcon, roles: ["all"] },
-  { name: "Settings", path: "/settings", icon: Cog6ToothIcon, roles: ["all"] },
 ];
 
 const filteredMenuItems = computed(() => {

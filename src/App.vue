@@ -1,15 +1,7 @@
 <script setup>
-import { useAuthStore } from './stores/auth'
-import { useRouter, useRoute } from "vue-router";
-import { computed } from 'vue'
+import { useAuthStore } from './stores/auth' 
  
-const auth = useAuthStore() 
-const router = useRouter()
-const route = useRoute()
-
-const showNavbar = computed(() => {
-  return !route.meta.hideNavbar
-})
+const auth = useAuthStore()   
 
 const logout = async () => {
   await auth.logout() 
@@ -17,17 +9,7 @@ const logout = async () => {
 </script>
 
 <template>
-  <div class="app-container"> 
-    <div v-if="!route.meta.hideNavbar">
-      <nav>
-        <router-link to="/">Home</router-link> |
-        <router-link v-if="!auth.isLoggedIn" to="/login">Login</router-link>
-        <router-link v-if="auth.isLoggedIn" to="/dashboard">Dashboard</router-link>
-        <button v-if="auth.isLoggedIn" @click="logout">Logout</button>
-      </nav>
-      <hr />
-    </div>
-
+  <div class="app-container">   
     <router-view />
   </div>
 </template>

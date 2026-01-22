@@ -1,19 +1,30 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../api";
 import SideBar from "../../components/sidebar.vue";
 import Button from "../../components/ui/button.vue";
 import Input from "../../components/ui/input.vue";
-import Modal from "../../components/modal.vue"; 
+import Modal from "../../components/modal.vue";
+
+import DeleteConfirmationModal from "../../components/deleteConfirmationModal.vue";
 import { UserPlusIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
 import Header from "../../components/header.vue";
 
-const auth = useAuthStore(); 
+const auth = useAuthStore();
 const users = ref([]);
 const roles = ref(["admin", "instructor", "student"]);
 const loading = ref(false);
+
 const showModal = ref(false);
+
+const showDeleteModal = ref(false);
+const userToDeleteId = ref(null);
+const editingUserId = ref(null);
+
+const modalTitle = computed(() =>
+  editingUserId.value ? "Edit User Details" : "Create New User",
+);
 
 const newUser = ref({
   username: "",
@@ -31,13 +42,86 @@ const fetchUsers = async () => {
   }
 };
 
-const handleCreateUser = async () => {
+// const handleCreateUser = async () => {
+//   loading.value = true;
+//   try {
+//     await api.post("/api/users", newUser.value);
+//     showModal.value = false;
+//     await fetchUsers();
+//     newUser.value = { username: "", email: "", password: "", role: "student" };
+//   } catch (error) {
+//     alert(
+//       "Error: " + (error.response?.data?.message || "Something went wrong"),
+//     );
+//   } finally {
+//     loading.value = false;
+//   }
+// };
+
+const openEditModal = (user) => {
+  console.log("Editing user:", user);
+  editingUserId.value = user.id;
+
+  let currentRole = "student";
+  if (user.roles && user.roles.length > 0) {
+    currentRole = user.roles[0].name.toLowerCase();
+  }
+
+  if (!roles.value.includes(currentRole)) {
+    currentRole = "student";
+  }
+
+  newUser.value = {
+    username: user.username,
+    email: user.email,
+    role: currentRole,
+    password: "",
+  };
+
+  showModal.value = true;
+};
+
+const handleSaveUser = async () => {
   loading.value = true;
   try {
-    await api.post("/api/users", newUser.value);
+    const payload = { ...newUser.value };
+
+    if (!payload.password) {
+      delete payload.password;
+    }
+
+    if (editingUserId.value) {
+      await api.put(`/api/users/${editingUserId.value}`, payload);
+    } else {
+      await api.post("/api/users", payload);
+    }
+
     showModal.value = false;
     await fetchUsers();
-    newUser.value = { username: "", email: "", password: "", role: "student" };
+  } catch (error) {
+    console.error(error);
+    alert(
+      "Error: " + (error.response?.data?.message || "Something went wrong"),
+    );
+  } finally {
+    loading.value = false;
+  }
+};
+
+const confirmDelete = (userId) => {
+  userToDeleteId.value = userId;
+  showDeleteModal.value = true;
+};
+
+const executeDelete = async () => {
+  if (!userToDeleteId.value) return;
+
+  loading.value = true;
+  try {
+    await api.delete(`/api/users/${userToDeleteId.value}`);
+    await fetchUsers();
+    showDeleteModal.value = false;
+    userToDeleteId.value = null;
   } catch (error) {
     alert(
       "Error: " + (error.response?.data?.message || "Something went wrong"),
@@ -47,31 +131,13 @@ const handleCreateUser = async () => {
   }
 };
 
-const handleDeleteUser = async (userId) => {
-  loading.value = true;
-  try {
-    await api.delete(`/api/users/${userId}`);
-    await fetchUsers();
-  } catch (error) {
-    alert(
-      "Error: " + (error.response?.data?.message || "Something went wrong"),
-    );
-  } finally {
-    loading.value = false;
-  }
-}; 
-
 onMounted(fetchUsers);
 </script>
 
 <template>
-  <div class="flex h-screen bg-gray-50 overflow-hidden"> 
-    <!-- Left Sidebar --> 
+  <div class="flex h-screen bg-gray-50 overflow-hidden">
     <SideBar />
-
-    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0">
-      <!-- Top Header -->
       <Header />
 
       <main class="flex-1 overflow-y-auto p-8">
@@ -82,8 +148,10 @@ onMounted(fetchUsers);
               Manage system accounts and access levels.
             </p>
           </div>
-          <Button @click="showModal = true">
-            <template #icon-left><UserPlusIcon class="w-5 h-5 mr-2" /></template>
+          <Button @click="openCreateModal">
+            <template #icon-left
+              ><UserPlusIcon class="w-5 h-5 mr-2"
+            /></template>
             Add New User
           </Button>
         </div>
@@ -117,7 +185,9 @@ onMounted(fetchUsers);
                 <td class="px-6 py-4 text-sm font-medium text-[#060e57]">
                   {{ user.username }}
                 </td>
-                <td class="px-6 py-4 text-sm text-[#364150]">{{ user.email }}</td>
+                <td class="px-6 py-4 text-sm text-[#364150]">
+                  {{ user.email }}
+                </td>
                 <td class="px-6 py-4">
                   <span
                     v-for="role in user.roles"
@@ -129,13 +199,14 @@ onMounted(fetchUsers);
                 </td>
                 <td class="px-6 py-4 space-x-3 text-center">
                   <button
+                    @click="openEditModal(user)"
                     class="text-blue-600 hover:text-blue-800 transition-colors"
                   >
                     <PencilIcon class="w-5 h-5" />
                   </button>
-                  <button 
-                    :loading="loading" 
-                    @click="handleDeleteUser(user.id)"
+
+                  <button
+                    @click="confirmDelete(user.id)"
                     class="text-red-600 hover:text-red-800 transition-colors"
                   >
                     <TrashIcon class="w-5 h-5" />
@@ -144,7 +215,6 @@ onMounted(fetchUsers);
               </tr>
             </tbody>
           </table>
-
           <div v-if="users.length === 0" class="p-12 text-center text-gray-400">
             No records found.
           </div>
@@ -152,7 +222,7 @@ onMounted(fetchUsers);
       </main>
     </div>
 
-    <Modal :show="showModal" title="Create New User" @close="showModal = false">
+    <Modal :show="showModal" :title="modalTitle" @close="showModal = false">
       <div class="space-y-4">
         <Input
           v-model="newUser.username"
@@ -164,7 +234,12 @@ onMounted(fetchUsers);
           label="Email Address"
           placeholder="user@example.com"
         />
-        <Input v-model="newUser.password" label="Password" type="password" />
+        <div>
+          <Input v-model="newUser.password" label="Password" type="password" />
+          <p v-if="editingUserId" class="text-xs text-gray-400 mt-1">
+            Leave blank to keep the current password.
+          </p>
+        </div>
 
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-semibold text-[#364150]"
@@ -185,10 +260,19 @@ onMounted(fetchUsers);
         <Button variant="outline" class="flex-1" @click="showModal = false"
           >Cancel</Button
         >
-        <Button :loading="loading" class="flex-1" @click="handleCreateUser"
-          >Create User</Button
-        >
+        <Button :loading="loading" class="flex-1" @click="handleSaveUser">
+          {{ editingUserId ? "Save Changes" : "Create User" }}
+        </Button>
       </template>
     </Modal>
+
+    <DeleteConfirmationModal
+      :show="showDeleteModal"
+      :loading="loading"
+      title="Delete User"
+      description="This action cannot be undone. This will permanently delete the user account from the system."
+      @close="showDeleteModal = false"
+      @confirm="executeDelete"
+    />
   </div>
 </template>

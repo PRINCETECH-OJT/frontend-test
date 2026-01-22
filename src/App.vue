@@ -12,21 +12,21 @@ const showNavbar = computed(() => {
 })
 
 const logout = async () => {
-  await auth.logout()
-  router.push('/login')
+  await auth.logout() 
 }
 </script>
 
 <template>
-  <div class="app-container">
-    <nav v-if="showNavbar">
-      <router-link to="/">Home</router-link> |
-      <router-link v-if="!auth.isLoggedIn" to="/login">Login</router-link>
-      <router-link v-if="auth.isLoggedIn" to="/dashboard">Dashboard</router-link>
-      <button v-if="auth.isLoggedIn" @click="logout">Logout</button>
-    </nav>
-
-    <hr v-if="showNavbar" />
+  <div class="app-container"> 
+    <div v-if="!route.meta.hideNavbar">
+      <nav>
+        <router-link to="/">Home</router-link> |
+        <router-link v-if="!auth.isLoggedIn" to="/login">Login</router-link>
+        <router-link v-if="auth.isLoggedIn" to="/dashboard">Dashboard</router-link>
+        <button v-if="auth.isLoggedIn" @click="logout">Logout</button>
+      </nav>
+      <hr />
+    </div>
 
     <router-view />
   </div>
@@ -35,8 +35,7 @@ const logout = async () => {
 <style> 
 .app-container {
   font-family: Arial, sans-serif;
-  text-align: center;
-  /* margin-top: 20px;  <-- You might want to remove top margin for the login page too */
+  text-align: center; 
 }
 nav {
   padding: 20px;

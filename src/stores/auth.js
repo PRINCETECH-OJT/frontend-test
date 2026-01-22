@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '../api'
+import router from '../router';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -9,22 +10,29 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isLoggedIn: (state) => !!state.user,
+
+    hasRole: (state) => (role) => {
+      return state.user?.roles?.includes(role) || false;
+    },
   },
 
   actions: {
     async login(username, password) {
       this.loading = true
 
-      // 1️⃣ Get CSRF cookie
-      await api.get('/sanctum/csrf-cookie')
+      try {
+        await api.get("/sanctum/csrf-cookie");
 
-      // 2️⃣ Login (session-based)
-      await api.post('/login', { username, password })
+        await api.post("/login", { username, password });
+ 
+        await this.fetchUser();
+        router.push('/dashboard'); 
 
-      // 3️⃣ Fetch authenticated user
-      await this.fetchUser()
-
-      this.loading = false
+      } catch (error) {
+        throw error;
+      } finally {
+        this.loading = false;
+      }
     },
 
     async logout() {
@@ -34,8 +42,8 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchUser() {
       try {
-        const response = await api.get('/api/user')
-        this.user = response.data
+        const response = await api.get('/api/user') 
+        this.user = response.data.data 
       } catch (e) {
         this.user = null
       }

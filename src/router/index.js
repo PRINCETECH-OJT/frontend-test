@@ -7,62 +7,24 @@ import Dashboard from '../pages/Dashboard.vue'
 
 //Admin Routes
 import User from "../pages/Admin/User.vue";
+import Role from "../pages/Admin/Role.vue";
 
 const routes = [
-   { path: "/", redirect: "/login" },
+  { path: "/", redirect: "/login" },
 
-  // Public Routes
-  {
-    path: "/login",
-    component: Login,
-    meta: { guest: true, hideNavbar: true },
-  },
-  {
-    path: "/register",
-    component: Register,
-    meta: { guest: true, hideNavbar: true },
-  },
+  { path: "/login", component: Login, meta: { guest: true } },
+  { path: "/register", component: Register, meta: { guest: true } },
 
-  {
-    path: "/dashboard",
-    component: Dashboard,
-  meta: { requiresAuth: true, hideNavbar: true },
-  },
-  {
-    path: "/users",
-    component: User,
-    meta: { requiresAuth: true, hideNavbar: true },
-  },
-  {
-    path: "/groups",
-    component: Dashboard, // replace later
-    meta: { requiresAuth: true, hideNavbar: true },
-  },
-  {
-    path: "/courses",
-    component: Dashboard,
-    meta: { requiresAuth: true, hideNavbar: true },
-  },
-  {
-    path: "/requests",
-    component: Dashboard,
-    meta: { requiresAuth: true, hideNavbar: true },
-  },
-  {
-    path: "/classes",
-    component: Dashboard,
-    meta: { requiresAuth: true, hideNavbar: true },
-  },
-  {
-    path: "/schedule",
-    component: Dashboard,
-    meta: { requiresAuth: true, hideNavbar: true },
-  },
-  {
-    path: "/settings",
-    component: Dashboard,
-    meta: { requiresAuth: true, hideNavbar: true },
-  },
+  { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/users", component: User, meta: { requiresAuth: true } },
+  { path: "/roles", component: Role, meta: { requiresAuth: true } },
+  { path: "/permissions", component: User, meta: { requiresAuth: true } },
+  { path: "/groups", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/courses", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/requests", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/classes", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/schedule", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/settings", component: Dashboard, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

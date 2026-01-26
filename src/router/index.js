@@ -10,6 +10,8 @@ import User from "../pages/Admin/User.vue";
 import Role from "../pages/Admin/Role.vue";
 
 import Campus from "../pages/Organization/Campus.vue";
+import College from "../pages/Organization/College.vue";
+import Department from "../pages/Organization/Department.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -21,6 +23,8 @@ const routes = [
   { path: "/users", component: User, meta: { requiresAuth: true } },
   { path: "/roles", component: Role, meta: { requiresAuth: true } },
   { path: "/campuses", component: Campus, meta: { requiresAuth: true } },
+  { path: "/colleges", component: College, meta: { requiresAuth: true } },
+  { path: "/departments", component: Department, meta: { requiresAuth: true } },
   { path: "/permissions", component: User, meta: { requiresAuth: true } },
   { path: "/groups", component: Dashboard, meta: { requiresAuth: true } },
   { path: "/courses", component: Dashboard, meta: { requiresAuth: true } },

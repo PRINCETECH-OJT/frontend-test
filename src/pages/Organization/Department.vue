@@ -2,44 +2,30 @@
 import { ref, onMounted } from "vue";
 import api from "../../api";
 import {
-  Building2,
+  Building, // Icon for Department
   Search,
   Plus,
   MoreVertical,
   GraduationCap,
-  X,
 } from "lucide-vue-next";
 import Sidebar from "../../components/sidebar.vue";
 import Header from "../../components/header.vue";
 import Button from "../../components/ui/button.vue";
-import Modal from "../../components/modal.vue";
 
-const campuses = ref([]);
+const departments = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
-const isModalOpen = ref(false);
-const selectedCampus = ref(null);
-
-const openCollegesModal = (campus) => {
-  selectedCampus.value = campus;
-  isModalOpen.value = true;
-};
-
-const closeCollegesModal = () => {
-  isModalOpen.value = false;
-  selectedCampus.value = null;
-};
-
-const fetchCampuses = async () => {
+const fetchDepartments = async () => {
   try {
     loading.value = true;
-    const response = await api.get("/api/campuses", {
+    const response = await api.get("/api/departments", {
       withCredentials: true,
       headers: { Accept: "application/json" },
     });
 
-    campuses.value = Array.isArray(response.data)
+    // Handle both direct array or paginated response
+    departments.value = Array.isArray(response.data)
       ? response.data
       : response.data?.data || [];
   } catch (err) {
@@ -51,7 +37,7 @@ const fetchCampuses = async () => {
 };
 
 onMounted(() => {
-  fetchCampuses();
+  fetchDepartments();
 });
 </script>
 
@@ -68,15 +54,15 @@ onMounted(() => {
         >
           <div>
             <h1 class="text-2xl font-bold text-slate-800 tracking-tight">
-              Campus Management
+              Department Management
             </h1>
             <p class="text-slate-500 text-sm">
-              Manage USTP university locations and statuses.
+              Manage academic departments and college assignments.
             </p>
           </div>
           <Button>
             <template #icon-left><Plus class="w-5 h-5" /></template>
-            Add Campus
+            Add Department
           </Button>
         </div>
 
@@ -93,8 +79,8 @@ onMounted(() => {
               />
               <input
                 type="text"
-                placeholder="Search campuses..."
-                class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                placeholder="Search departments..."
+                class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all"
               />
             </div>
           </div>
@@ -113,42 +99,56 @@ onMounted(() => {
                   class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider"
                 >
                   <th class="px-6 py-4 w-20">ID</th>
-                  <th class="px-6 py-4">Campus Name</th>
-                  <th class="px-6 py-4">Created At</th>
+                  <th class="px-6 py-4">Department Info</th>
+                  <th class="px-6 py-4">Parent College</th>
                   <th class="px-6 py-4">Status</th>
                   <th class="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
                 <tr
-                  v-for="campus in campuses"
-                  :key="campus.id"
-                  @click="openCollegesModal(campus)"
-                  class="group hover:bg-blue-50/50 transition-colors duration-150 cursor-pointer"
+                  v-for="dept in departments"
+                  :key="dept.id"
+                  class="group hover:bg-blue-50/50 transition-colors duration-150"
                 >
                   <td class="px-6 py-4 text-slate-400 font-mono text-xs">
-                    #{{ campus.id }}
+                    #{{ dept.id }}
                   </td>
+
                   <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
                       <div
-                        class="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:scale-110 transition-transform"
+                        class="p-2 bg-purple-100 text-purple-600 rounded-lg group-hover:scale-110 transition-transform"
                       >
-                        <Building2 :size="18" />
+                        <Building :size="18" />
                       </div>
-                      <p class="font-bold text-slate-700 text-sm">
-                        {{ campus.campus_name || "Name Missing" }}
-                      </p>
+                      <div>
+                        <p class="font-bold text-slate-700 text-sm">
+                          {{ dept.department_code }}
+                        </p>
+                        <p class="text-xs text-slate-500">
+                          {{ dept.department_name }}
+                        </p>
+                      </div>
                     </div>
                   </td>
-                  <td class="px-6 py-4 text-slate-500 text-sm">
-                    {{ new Date(campus.created_at).toLocaleDateString() }}
+
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2 text-slate-600">
+                      <GraduationCap :size="16" class="text-slate-400" />
+                      <span class="text-sm">
+                        {{
+                          dept.college?.college_code || "No College Assigned"
+                        }}
+                      </span>
+                    </div>
                   </td>
+
                   <td class="px-6 py-4">
                     <span
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
                       :class="
-                        campus.is_active
+                        dept.is_active
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           : 'bg-slate-100 text-slate-600 border-slate-200'
                       "
@@ -156,15 +156,15 @@ onMounted(() => {
                       <span
                         class="w-1.5 h-1.5 rounded-full mr-1.5"
                         :class="
-                          campus.is_active ? 'bg-emerald-500' : 'bg-slate-400'
+                          dept.is_active ? 'bg-emerald-500' : 'bg-slate-400'
                         "
                       ></span>
-                      {{ campus.is_active ? "Active" : "Inactive" }}
+                      {{ dept.is_active ? "Active" : "Inactive" }}
                     </span>
                   </td>
+
                   <td class="px-6 py-4 text-right">
                     <button
-                      @click.stop
                       class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     >
                       <MoreVertical :size="18" />
@@ -174,65 +174,25 @@ onMounted(() => {
               </tbody>
             </table>
           </div>
+
+          <div
+            v-if="!loading && departments?.length === 0"
+            class="p-12 text-center"
+          >
+            <div
+              class="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <Building class="text-slate-300" :size="32" />
+            </div>
+            <h3 class="text-slate-800 font-medium mb-1">
+              No departments found
+            </h3>
+            <p class="text-slate-500 text-sm">
+              Get started by adding a new department.
+            </p>
+          </div>
         </div>
       </main>
     </div>
-
-    <Modal
-      :show="isModalOpen"
-      :title="selectedCampus?.campus_name"
-      @close="closeCollegesModal"
-    >
-      <div class="p-1 max-h-[60vh] overflow-y-auto">
-        <p class="text-sm text-slate-500 text-center mb-4">
-          List of Associated Colleges
-        </p>
-
-        <div v-if="selectedCampus?.colleges?.length > 0" class="grid gap-3">
-          <div
-            v-for="college in selectedCampus.colleges"
-            :key="college.id"
-            class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/30 hover:border-blue-200 hover:bg-blue-50/50 transition-all group"
-          >
-            <div
-              class="p-3 bg-white rounded-xl shadow-sm border border-slate-100 group-hover:text-blue-600 transition-colors"
-            >
-              <GraduationCap :size="20" />
-            </div>
-            <div>
-              <p class="font-bold text-slate-800 leading-tight">
-                {{ college.college_code }}
-              </p>
-              <p class="text-xs text-slate-500">
-                {{ college.college_description }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div v-else class="text-center py-12">
-          <div
-            class="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <GraduationCap class="text-slate-300" :size="32" />
-          </div>
-          <h3 class="text-slate-800 font-medium">No colleges found</h3>
-          <p class="text-slate-400 text-sm">
-            No colleges are currently linked to this campus.
-          </p>
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="flex justify-end w-full">
-          <button
-            @click="closeCollegesModal"
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
-          >
-            Close
-          </button>
-        </div>
-      </template>
-    </Modal>
   </div>
 </template>

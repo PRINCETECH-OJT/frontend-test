@@ -1,7 +1,7 @@
 <template>
   <div
     :style="{ backgroundColor: color }"
-    class="relative flex flex-col items-center justify-center rounded-2xl p-4 text-white shadow-sm transition-all duration-300 hover:brightness-95 hover:shadow-lg hover:-translate-y-1 cursor-pointer aspect-square group"
+    class="relative flex flex-col items-center justify-center rounded-xl p-4 text-white shadow-sm transition-all duration-300 hover:brightness-95 hover:shadow-lg hover:-translate-y-1 cursor-pointer aspect-square group"
   >
     <div
       v-if="count > 0"

@@ -7,7 +7,7 @@ import {
   HomeIcon,
   UsersIcon,
   UserGroupIcon,
-  BuildingLibraryIcon, 
+  BuildingLibraryIcon,
   BuildingOfficeIcon,
   Cog6ToothIcon,
   BookOpenIcon,
@@ -15,7 +15,7 @@ import {
   CalendarIcon,
   UserCircleIcon,
   ArrowLeftOnRectangleIcon,
-} from "@heroicons/vue/24/outline"; 
+} from "@heroicons/vue/24/outline";
 
 /* Optional: allow parent to control mobile sidebar */
 defineProps({
@@ -31,23 +31,68 @@ const authStore = useAuthStore();
 
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: HomeIcon, roles: ["all"] },
-  { name: "Users", path: "/users", icon: UsersIcon, roles: ["admin", "super_admin"] },
-  { name: "Roles & Perm", path: "/roles", icon: UserGroupIcon, roles: ["admin"] },
-  { name: "Campuses", path: "/campuses", icon: BuildingLibraryIcon, roles: ["admin", "super_admin"] },
-  { name: "Colleges", path: "/colleges", icon: BuildingOfficeIcon, roles: ["admin", "super_admin"] },
-  { name: "Departments", path: "/departments", icon: Cog6ToothIcon, roles: ["admin", "instructor"] },
-  { name: "Curricula", path: "/curricula", icon: BookOpenIcon, roles: ["admin", "super_admin"] },
-  { name: "Courses", path: "/courses", icon: BookOpenIcon, roles: ["admin", "super_admin"] },
-  { name: "Students", path: "/students", icon: UserCircleIcon, roles: ["admin", "super_admin"] },
-  { name: "My Classes", path: "/classes", icon: AcademicCapIcon, roles: ["student", "instructor"] },
+  {
+    name: "Users",
+    path: "/users",
+    icon: UsersIcon,
+    roles: ["admin", "super_admin"],
+  },
+  {
+    name: "Roles & Perm",
+    path: "/roles",
+    icon: UserGroupIcon,
+    roles: ["admin"],
+  },
+  {
+    name: "Campuses",
+    path: "/campuses",
+    icon: BuildingLibraryIcon,
+    roles: ["admin", "super_admin"],
+  },
+  {
+    name: "Colleges",
+    path: "/colleges",
+    icon: BuildingOfficeIcon,
+    roles: ["admin", "super_admin"],
+  },
+  {
+    name: "Departments",
+    path: "/departments",
+    icon: Cog6ToothIcon,
+    roles: ["admin", "instructor"],
+  },
+  {
+    name: "Curricula",
+    path: "/curricula",
+    icon: BookOpenIcon,
+    roles: ["admin", "super_admin"],
+  },
+  {
+    name: "Courses",
+    path: "/courses",
+    icon: BookOpenIcon,
+    roles: ["admin", "super_admin"],
+  },
+  {
+    name: "Students",
+    path: "/students",
+    icon: UserCircleIcon,
+    roles: ["admin", "super_admin"],
+  },
+  {
+    name: "My Classes",
+    path: "/classes",
+    icon: AcademicCapIcon,
+    roles: ["student", "instructor"],
+  },
   { name: "Schedule", path: "/schedule", icon: CalendarIcon, roles: ["all"] },
 ];
 
 const filteredMenuItems = computed(() => {
-  return menuItems.filter(item => {
+  return menuItems.filter((item) => {
     if (item.roles.includes("all")) return true;
     if (!authStore.user?.roles) return false;
-    return item.roles.some(role => authStore.hasRole(role));
+    return item.roles.some((role) => authStore.hasRole(role));
   });
 });
 
@@ -63,7 +108,7 @@ const handleLogout = async () => {
   <aside
     :class="[
       'fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 lg:translate-x-0',
-      mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      mobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
   >
     <!-- Logo -->
@@ -83,9 +128,11 @@ const handleLogout = async () => {
         :key="item.name"
         :to="item.path"
         class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition"
-        :class="isActive(item.path)
-          ? 'bg-blue-50 text-blue-700 border border-blue-100'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'"
+        :class="
+          isActive(item.path)
+            ? 'bg-blue-50 text-blue-700 border border-blue-100'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
+        "
       >
         <component :is="item.icon" class="w-5 h-5" />
         {{ item.name }}

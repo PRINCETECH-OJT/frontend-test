@@ -1,13 +1,15 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
-import Login from '../pages/Login.vue'  
+import Login from "../pages/Login.vue";
 import Register from "../pages/Register.vue";
-import Dashboard from '../pages/Dashboard.vue'
+import Dashboard from "../pages/Dashboard.vue";
 
 //Admin Routes
 import User from "../pages/Admin/User.vue";
 import Role from "../pages/Admin/Role.vue";
+
+import Campus from "../pages/Organization/Campus.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -18,6 +20,7 @@ const routes = [
   { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true } },
   { path: "/users", component: User, meta: { requiresAuth: true } },
   { path: "/roles", component: Role, meta: { requiresAuth: true } },
+  { path: "/campuses", component: Campus, meta: { requiresAuth: true } },
   { path: "/permissions", component: User, meta: { requiresAuth: true } },
   { path: "/groups", component: Dashboard, meta: { requiresAuth: true } },
   { path: "/courses", component: Dashboard, meta: { requiresAuth: true } },
@@ -30,25 +33,25 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-})
+});
 
 // Route guard
 router.beforeEach(async (to, from, next) => {
-  const auth = useAuthStore()
+  const auth = useAuthStore();
 
   if (auth.user === null) {
-    await auth.fetchUser()
+    await auth.fetchUser();
   }
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
-    return next('/login')
+    return next("/login");
   }
 
   if (to.meta.guest && auth.isLoggedIn) {
-    return next('/dashboard')
+    return next("/dashboard");
   }
 
-  next()
-})
+  next();
+});
 
-export default router
+export default router;

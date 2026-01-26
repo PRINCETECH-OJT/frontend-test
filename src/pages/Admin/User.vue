@@ -42,21 +42,16 @@ const fetchUsers = async () => {
   }
 };
 
-// const handleCreateUser = async () => {
-//   loading.value = true;
-//   try {
-//     await api.post("/api/users", newUser.value);
-//     showModal.value = false;
-//     await fetchUsers();
-//     newUser.value = { username: "", email: "", password: "", role: "student" };
-//   } catch (error) {
-//     alert(
-//       "Error: " + (error.response?.data?.message || "Something went wrong"),
-//     );
-//   } finally {
-//     loading.value = false;
-//   }
-// };
+const openCreateModal = () => {
+  editingUserId.value = null;
+  newUser.value = {
+    username: "",
+    email: "",
+    password: "",
+    role: "student",
+  };
+  showModal.value = true;
+};
 
 const openEditModal = (user) => {
   console.log("Editing user:", user);

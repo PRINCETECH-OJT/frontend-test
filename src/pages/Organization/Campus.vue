@@ -17,14 +17,9 @@ const fetchCampuses = async () => {
       withCredentials: true,
       headers: { Accept: "application/json" },
     });
-
-    if (Array.isArray(response.data)) {
-      campuses.value = response.data;
-    } else if (response.data && Array.isArray(response.data.data)) {
-      campuses.value = response.data.data;
-    } else {
-      campuses.value = [];
-    }
+    campuses.value = Array.isArray(response.data)
+      ? response.data
+      : response.data?.data || [];
   } catch (err) {
     console.error(err);
     error.value = err.response?.data?.message || err.message;

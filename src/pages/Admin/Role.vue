@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue"; 
+import { ref, onMounted, computed } from "vue";
 import api from "../../api";
 import Sidebar from "../../components/sidebar.vue";
 import Header from "../../components/header.vue";
@@ -26,14 +26,14 @@ const fetchPermissions = async () => {
 /* Select a role */
 const selectRole = (role) => {
   selectedRole.value = role;
-  selectedPermissions.value = role.permissions.map(p => p.id);
+  selectedPermissions.value = role.permissions.map((p) => p.id);
 };
 
 /* Toggle permission */
 const togglePermission = (permissionId) => {
   if (selectedPermissions.value.includes(permissionId)) {
     selectedPermissions.value = selectedPermissions.value.filter(
-      id => id !== permissionId
+      (id) => id !== permissionId,
     );
   } else {
     selectedPermissions.value.push(permissionId);
@@ -50,10 +50,8 @@ const savePermissions = async () => {
     permissions: selectedPermissions.value,
   });
 
-  await fetchRoles(); // refresh roles
-  const refreshedRole = roles.value.find(
-    r => r.id === selectedRole.value.id
-  );
+  await fetchRoles();
+  const refreshedRole = roles.value.find((r) => r.id === selectedRole.value.id);
 
   selectRole(refreshedRole);
   saving.value = false;
@@ -67,12 +65,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex h-screen bg-gray-50 overflow-hidden"> 
+  <div class="flex h-screen bg-gray-50 overflow-hidden">
     <Sidebar />
-    
+
     <div class="flex-1 flex flex-col min-w-0">
       <Header />
-      
+
       <main class="flex-1 overflow-y-auto p-8">
         <h1 class="text-2xl font-bold text-[#060e57]">Roles & Permissions</h1>
 
@@ -87,9 +85,11 @@ onMounted(async () => {
                 :key="role.id"
                 @click="selectRole(role)"
                 class="px-4 py-2 rounded-lg cursor-pointer transition"
-                :class="selectedRole?.id === role.id
-                  ? 'bg-blue-50 text-blue-700 font-semibold'
-                  : 'hover:bg-gray-50'"
+                :class="
+                  selectedRole?.id === role.id
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'hover:bg-gray-50'
+                "
               >
                 {{ role.name }}
               </li>

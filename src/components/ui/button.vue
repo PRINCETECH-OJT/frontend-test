@@ -26,11 +26,12 @@ const props = defineProps({
 });
 
 const variantClasses = {
+  default: "bg-[#060e57] text-white hover:bg-[#0a168a] shadow-sm",
   primary: "bg-[#060e57] text-white hover:bg-[#0a168a] shadow-sm",
   secondary: "bg-white text-[#060e57] border border-[#060e57] hover:bg-gray-50",
   danger: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
   outline:
-    "bg-transparent text-[#364150] border border-gray-300 hover:bg-gray-50",
+    "bg-transparent text-[#060e57] border border-[#060e57] hover:bg-gray-50",
 };
 
 const sizeClasses = {

@@ -13,6 +13,8 @@ import Campus from "../pages/Organization/Campus.vue";
 import College from "../pages/Organization/College.vue";
 import Department from "../pages/Organization/Department.vue";
 
+import Admission from "../pages/Admission/Admission.vue";
+
 const routes = [
   { path: "/", redirect: "/login" },
 
@@ -32,6 +34,8 @@ const routes = [
   { path: "/classes", component: Dashboard, meta: { requiresAuth: true } },
   { path: "/schedule", component: Dashboard, meta: { requiresAuth: true } },
   { path: "/settings", component: Dashboard, meta: { requiresAuth: true } },
+
+  { path: "/admission", component: Admission },
 ];
 
 const router = createRouter({

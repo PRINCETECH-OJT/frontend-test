@@ -6,18 +6,18 @@ import SideBar from "../../components/sidebar.vue";
 import Button from "../../components/ui/button.vue";
 import Input from "../../components/ui/input.vue";
 import Modal from "../../components/modal.vue";
+import Header from "../../components/header.vue";
 
 import DeleteConfirmationModal from "../../components/deleteConfirmationModal.vue";
 import { UserPlusIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
-import Header from "../../components/header.vue";
 
 const auth = useAuthStore();
 const users = ref([]);
 const roles = ref(["admin", "instructor", "student"]);
-const loading = ref(false);
+const loading = ref(true); // Initial state is true for fetching
+const isProcessing = ref(false); // New state for button actions (Save/Delete)
 
 const showModal = ref(false);
-
 const showDeleteModal = ref(false);
 const userToDeleteId = ref(null);
 const editingUserId = ref(null);
@@ -35,36 +35,26 @@ const newUser = ref({
 
 const fetchUsers = async () => {
   try {
+    loading.value = true;
     const response = await api.get("/api/users");
     users.value = response.data;
   } catch (error) {
     console.error("Fetch error:", error);
+  } finally {
+    loading.value = false;
   }
 };
 
 const openCreateModal = () => {
   editingUserId.value = null;
-  newUser.value = {
-    username: "",
-    email: "",
-    password: "",
-    role: "student",
-  };
+  newUser.value = { username: "", email: "", password: "", role: "student" };
   showModal.value = true;
 };
 
 const openEditModal = (user) => {
-  console.log("Editing user:", user);
   editingUserId.value = user.id;
-
-  let currentRole = "student";
-  if (user.roles && user.roles.length > 0) {
-    currentRole = user.roles[0].name.toLowerCase();
-  }
-
-  if (!roles.value.includes(currentRole)) {
-    currentRole = "student";
-  }
+  let currentRole = user.roles?.[0]?.name.toLowerCase() || "student";
+  if (!roles.value.includes(currentRole)) currentRole = "student";
 
   newUser.value = {
     username: user.username,
@@ -72,18 +62,14 @@ const openEditModal = (user) => {
     role: currentRole,
     password: "",
   };
-
   showModal.value = true;
 };
 
 const handleSaveUser = async () => {
-  loading.value = true;
+  isProcessing.value = true;
   try {
     const payload = { ...newUser.value };
-
-    if (!payload.password) {
-      delete payload.password;
-    }
+    if (!payload.password) delete payload.password;
 
     if (editingUserId.value) {
       await api.put(`/api/users/${editingUserId.value}`, payload);
@@ -99,7 +85,7 @@ const handleSaveUser = async () => {
       "Error: " + (error.response?.data?.message || "Something went wrong"),
     );
   } finally {
-    loading.value = false;
+    isProcessing.value = false;
   }
 };
 
@@ -110,8 +96,7 @@ const confirmDelete = (userId) => {
 
 const executeDelete = async () => {
   if (!userToDeleteId.value) return;
-
-  loading.value = true;
+  isProcessing.value = true;
   try {
     await api.delete(`/api/users/${userToDeleteId.value}`);
     await fetchUsers();
@@ -122,7 +107,7 @@ const executeDelete = async () => {
       "Error: " + (error.response?.data?.message || "Something went wrong"),
     );
   } finally {
-    loading.value = false;
+    isProcessing.value = false;
   }
 };
 
@@ -130,7 +115,7 @@ onMounted(fetchUsers);
 </script>
 
 <template>
-  <div class="flex h-screen bg-gray-50 overflow-hidden">
+  <div class="flex h-screen bg-gray-50 overflow-hidden font-sans">
     <SideBar />
     <div class="flex-1 flex flex-col min-w-0">
       <Header />
@@ -138,7 +123,7 @@ onMounted(fetchUsers);
       <main class="flex-1 overflow-y-auto p-8">
         <div class="flex justify-between items-center mb-8">
           <div>
-            <h1 class="text-2xl font-bold text-[#060e57]">User Management</h1>
+            <h1 class="text-2xl font-bold text-black">User Management</h1>
             <p class="text-sm text-gray-500 mt-1">
               Manage system accounts and access levels.
             </p>
@@ -154,7 +139,16 @@ onMounted(fetchUsers);
         <div
           class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
         >
-          <table class="w-full text-left border-collapse">
+          <div v-if="loading" class="p-20 text-center">
+            <div
+              class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"
+            ></div>
+            <p class="text-slate-500 text-sm font-medium">
+              Loading user records...
+            </p>
+          </div>
+
+          <table v-else class="w-full text-left border-collapse">
             <thead class="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th class="px-6 py-4 text-sm font-bold text-[#364150]">
@@ -199,7 +193,6 @@ onMounted(fetchUsers);
                   >
                     <PencilIcon class="w-5 h-5" />
                   </button>
-
                   <button
                     @click="confirmDelete(user.id)"
                     class="text-red-600 hover:text-red-800 transition-colors"
@@ -210,7 +203,11 @@ onMounted(fetchUsers);
               </tr>
             </tbody>
           </table>
-          <div v-if="users.length === 0" class="p-12 text-center text-gray-400">
+
+          <div
+            v-if="!loading && users.length === 0"
+            class="p-12 text-center text-gray-400"
+          >
             No records found.
           </div>
         </div>
@@ -235,14 +232,13 @@ onMounted(fetchUsers);
             Leave blank to keep the current password.
           </p>
         </div>
-
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-semibold text-[#364150]"
             >Assign Role</label
           >
           <select
             v-model="newUser.role"
-            class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all capitalize"
+            class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm transition-all capitalize outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option v-for="role in roles" :key="role" :value="role">
               {{ role }}
@@ -250,12 +246,11 @@ onMounted(fetchUsers);
           </select>
         </div>
       </div>
-
       <template #footer>
         <Button variant="outline" class="flex-1" @click="showModal = false"
           >Cancel</Button
         >
-        <Button :loading="loading" class="flex-1" @click="handleSaveUser">
+        <Button :loading="isProcessing" class="flex-1" @click="handleSaveUser">
           {{ editingUserId ? "Save Changes" : "Create User" }}
         </Button>
       </template>
@@ -263,9 +258,9 @@ onMounted(fetchUsers);
 
     <DeleteConfirmationModal
       :show="showDeleteModal"
-      :loading="loading"
+      :loading="isProcessing"
       title="Delete User"
-      description="This action cannot be undone. This will permanently delete the user account from the system."
+      description="This action cannot be undone. This will permanently delete the user account."
       @close="showDeleteModal = false"
       @confirm="executeDelete"
     />

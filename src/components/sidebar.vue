@@ -1,23 +1,24 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 
+import { ChevronDownIcon } from "@heroicons/vue/20/solid";
 import {
   HomeIcon,
   UsersIcon,
   UserGroupIcon,
   BuildingLibraryIcon,
-  BuildingOfficeIcon,
-  Cog6ToothIcon,
   BookOpenIcon,
   AcademicCapIcon,
   CalendarIcon,
   UserCircleIcon,
   ArrowLeftOnRectangleIcon,
+  ViewColumnsIcon,
+  BuildingOfficeIcon,
+  RectangleGroupIcon,
 } from "@heroicons/vue/24/outline";
 
-/* Optional: allow parent to control mobile sidebar */
 defineProps({
   mobileMenuOpen: {
     type: Boolean,
@@ -28,6 +29,16 @@ defineProps({
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+
+const expandedMenus = ref([]);
+
+const toggleMenu = (menuName) => {
+  if (expandedMenus.value.includes(menuName)) {
+    expandedMenus.value = expandedMenus.value.filter((m) => m !== menuName);
+  } else {
+    expandedMenus.value.push(menuName);
+  }
+};
 
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: HomeIcon, roles: ["all"] },
@@ -48,18 +59,27 @@ const menuItems = [
     path: "/campuses",
     icon: BuildingLibraryIcon,
     roles: ["admin", "super_admin"],
-  },
-  {
-    name: "Colleges",
-    path: "/colleges",
-    icon: BuildingOfficeIcon,
-    roles: ["admin", "super_admin"],
-  },
-  {
-    name: "Departments",
-    path: "/departments",
-    icon: Cog6ToothIcon,
-    roles: ["admin", "instructor"],
+
+    children: [
+      {
+        name: "Overview",
+        path: "/campuses",
+        icon: ViewColumnsIcon,
+        roles: ["admin", "super_admin"],
+      },
+      {
+        name: "Colleges",
+        path: "/colleges",
+        icon: AcademicCapIcon,
+        roles: ["admin", "super_admin"],
+      },
+      {
+        name: "Departments",
+        path: "/departments",
+        icon: BuildingOfficeIcon,
+        roles: ["admin", "super_admin"],
+      },
+    ],
   },
   {
     name: "Curricula",
@@ -111,7 +131,6 @@ const handleLogout = async () => {
       mobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
   >
-    <!-- Logo -->
     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-200">
       <div class="p-2 bg-[#060e57] rounded-lg">
         <AcademicCapIcon class="w-6 h-6 text-white" />
@@ -121,25 +140,64 @@ const handleLogout = async () => {
       </span>
     </div>
 
-    <!-- Navigation -->
-    <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-      <router-link
-        v-for="item in filteredMenuItems"
-        :key="item.name"
-        :to="item.path"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition"
-        :class="
-          isActive(item.path)
-            ? 'bg-blue-50 text-blue-700 border border-blue-100'
-            : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
-        "
-      >
-        <component :is="item.icon" class="w-5 h-5" />
-        {{ item.name }}
-      </router-link>
+    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+      <div v-for="item in filteredMenuItems" :key="item.name">
+        <div v-if="item.children">
+          <button
+            @click="toggleMenu(item.name)"
+            class="flex w-full items-center cursor-pointer justify-between gap-3 px-4 py-3 rounded-lg ml-2 font-medium transition text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+            :class="{
+              'bg-blue-50 text-blue-700':
+                expandedMenus.includes(item.name) || isActive(item.path),
+            }"
+          >
+            <div class="flex items-center gap-3">
+              <component :is="item.icon" class="w-5 h-5" />
+              {{ item.name }}
+            </div>
+            <ChevronDownIcon
+              class="w-4 h-4 transition-transform duration-200"
+              :class="{ 'rotate-180': expandedMenus.includes(item.name) }"
+            />
+          </button>
+
+          <div
+            v-show="expandedMenus.includes(item.name)"
+            class="mt-1 ml-4 pl-4 border-l border-gray-100 space-y-1 cursor-pointer"
+          >
+            <router-link
+              v-for="sub in item.children"
+              :key="sub.name"
+              :to="sub.path"
+              class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg transition"
+              :class="
+                isActive(sub.path)
+                  ? 'text-blue-700 font-bold bg-blue-50/50'
+                  : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50/50'
+              "
+            >
+              <component :is="sub.icon" class="w-4 h-4" />
+              {{ sub.name }}
+            </router-link>
+          </div>
+        </div>
+
+        <router-link
+          v-else
+          :to="item.path"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition"
+          :class="
+            isActive(item.path)
+              ? 'bg-blue-50 text-blue-700 border border-blue-100'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
+          "
+        >
+          <component :is="item.icon" class="w-5 h-5" />
+          {{ item.name }}
+        </router-link>
+      </div>
     </nav>
 
-    <!-- User + Logout -->
     <div class="px-4 py-4 border-t border-gray-200 space-y-4">
       <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-lg">
         <img
@@ -151,7 +209,7 @@ const handleLogout = async () => {
           <p class="text-sm font-semibold text-gray-900 truncate">
             {{ authStore.user?.username || "Loading..." }}
           </p>
-          <p class="text-xs text-gray-500 truncate">
+          <p class="text-xs text-gray-500 truncate capitalize">
             {{ authStore.user?.roles?.[0] || "No role" }}
           </p>
         </div>

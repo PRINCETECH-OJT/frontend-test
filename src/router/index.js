@@ -43,12 +43,17 @@ const router = createRouter({
   routes,
 });
 
-// Route guard
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();
 
-  if (auth.user === null) {
-    await auth.fetchUser();
+  if (to.meta.requiresAuth || to.meta.guest) {
+    if (auth.user === null && localStorage.getItem("token")) {
+      try {
+        await auth.fetchUser();
+      } catch (error) {
+        localStorage.removeItem("token");
+      }
+    }
   }
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {

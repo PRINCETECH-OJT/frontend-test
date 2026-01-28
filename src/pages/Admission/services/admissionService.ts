@@ -15,14 +15,6 @@ const parseNumber = (value: string | undefined | null) => {
   return parseInt(String(value).replace(/,/g, ""), 10) || 0;
 };
 
-const generateStudentId = () => {
-  const year = new Date().getFullYear();
-  const timestamp = Date.now().toString().slice(-4);
-  const random = Math.floor(1000 + Math.random() * 9000);
-
-  return parseInt(`${year}${timestamp}${random}`);
-};
-
 const CURRICULUM_MAP: Record<string, number> = {
   "BS Information Technology": 1,
   "BS Computer Science": 2,
@@ -30,10 +22,7 @@ const CURRICULUM_MAP: Record<string, number> = {
 };
 
 export const submitAdmission = async (data: ApplicationData) => {
-  const token = localStorage.getItem("token");
   await api.get("/sanctum/csrf-cookie");
-
-  const myStudentId = generateStudentId();
 
   const parents = [];
   if (data.fatherName) {
@@ -83,8 +72,7 @@ export const submitAdmission = async (data: ApplicationData) => {
   const payload = {
     program: {
       curriculum_id: CURRICULUM_MAP[data.firstChoiceProgram] || 1,
-
-      student_id: 1,
+      // student_id: 1,
       enrolled_at: new Date().toISOString().split("T")[0],
       status: "pending",
     },
@@ -164,9 +152,5 @@ export const submitAdmission = async (data: ApplicationData) => {
     },
   };
 
-  return api.post("/api/student-admission", payload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  return api.post("/api/student-admission", payload);
 };

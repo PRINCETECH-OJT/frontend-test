@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import api from "../../api";
 import {
-  Building, // Icon for Department
+  Building,
   Search,
   Plus,
   MoreVertical,

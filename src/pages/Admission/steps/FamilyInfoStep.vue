@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import {
   type ApplicationData,
   type Sibling,
   PROVINCES,
   YEARLY_INCOMES,
 } from "../types/admission";
+import Modal from "../../../components/modal.vue";
 
 defineProps<{
   data: ApplicationData;
@@ -42,6 +43,22 @@ const handleAddSibling = (data: ApplicationData) => {
   };
   isDialogOpen.value = false;
 };
+
+watch(
+  () => newSibling.value.dateOfBirth,
+  (newDate) => {
+    if (newDate) {
+      const today = new Date();
+      const birthDate = new Date(newDate);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      newSibling.value.age = age.toString();
+    }
+  },
+);
 
 const handleRemoveSibling = (data: ApplicationData, id: string) => {
   emit("update", {
@@ -706,120 +723,122 @@ const handleRemoveSibling = (data: ApplicationData, id: string) => {
     </section>
 
     <!-- Add Sibling Dialog -->
-    <div
-      v-if="isDialogOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      @click.self="isDialogOpen = false"
-    >
-      <div class="w-full max-w-md rounded-lg bg-card p-6 shadow-lg">
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold text-foreground">Add Sibling</h3>
-          <p class="text-sm text-muted-foreground">
-            Enter the details of your sibling.
-          </p>
+    <Modal :show="isDialogOpen" @close="isDialogOpen = false">
+      <div class="mb-6">
+        <h3 class="text-xl font-bold tracking-tight text-[#060E57]">
+          Add Sibling
+        </h3>
+        <p class="text-sm text-gray-500">
+          Enter the personal and school details of your sibling.
+        </p>
+      </div>
+
+      <div class="space-y-5">
+        <div class="space-y-1.5">
+          <label class="text-sm font-bold text-gray-700">
+            Full Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            v-model="newSibling.fullName"
+            type="text"
+            placeholder="e.g. Juan Dela Cruz"
+            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#060E57] focus:outline-none focus:ring-1 focus:ring-[#060E57]"
+          />
         </div>
 
-        <div class="space-y-4 py-4">
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-foreground"
-              >Full Name *</label
-            >
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-sm font-bold text-gray-700">Date of Birth</label>
             <input
-              v-model="newSibling.fullName"
-              type="text"
-              placeholder="Full name"
-              class="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+              v-model="newSibling.dateOfBirth"
+              type="date"
+              class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-[#060E57] focus:outline-none focus:ring-1 focus:ring-[#060E57]"
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="text-sm font-medium text-foreground"
-                >Date of Birth</label
-              >
-              <input
-                v-model="newSibling.dateOfBirth"
-                type="date"
-                class="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-              />
-            </div>
-
-            <div class="space-y-2">
-              <label class="text-sm font-medium text-foreground">Age</label>
-              <input
-                v-model="newSibling.age"
-                type="text"
-                placeholder="Age"
-                class="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-              />
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-foreground">Gender</label>
-            <div class="flex gap-4">
-              <label class="flex items-center space-x-2">
-                <input
-                  v-model="newSibling.gender"
-                  type="radio"
-                  value="M"
-                  class="h-4 w-4 accent-primary"
-                />
-                <span class="text-sm text-foreground">Male</span>
-              </label>
-              <label class="flex items-center space-x-2">
-                <input
-                  v-model="newSibling.gender"
-                  type="radio"
-                  value="F"
-                  class="h-4 w-4 accent-primary"
-                />
-                <span class="text-sm text-foreground">Female</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-foreground"
-              >Grade Level</label
-            >
+          <div class="space-y-1.5">
+            <label class="text-sm font-bold text-gray-700">Age</label>
             <input
-              v-model="newSibling.gradeLevel"
-              type="text"
-              placeholder="e.g., Grade 10"
-              class="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-            />
-          </div>
-
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-foreground"
-              >School Attended</label
-            >
-            <input
-              v-model="newSibling.schoolAttended"
-              type="text"
-              placeholder="Name of school"
-              class="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+              v-model="newSibling.age"
+              type="number"
+              readonly
+              placeholder="Auto"
+              class="w-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 focus:outline-none"
             />
           </div>
         </div>
 
-        <div class="mt-4 flex justify-end gap-2">
-          <button
-            class="rounded-md border bg-transparent px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-            @click="isDialogOpen = false"
+        <div class="space-y-1.5">
+          <label class="text-sm font-bold text-gray-700">Gender</label>
+          <div class="flex gap-4">
+            <label
+              class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 px-4 py-2 transition-all hover:bg-gray-50 has-[:checked]:border-[#060E57] has-[:checked]:bg-[#060E57]/5"
+            >
+              <input
+                v-model="newSibling.gender"
+                type="radio"
+                value="M"
+                class="h-4 w-4 accent-[#060E57]"
+              />
+              <span class="text-sm font-medium text-gray-700">Male</span>
+            </label>
+
+            <label
+              class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 px-4 py-2 transition-all hover:bg-gray-50 has-[:checked]:border-[#060E57] has-[:checked]:bg-[#060E57]/5"
+            >
+              <input
+                v-model="newSibling.gender"
+                type="radio"
+                value="F"
+                class="h-4 w-4 accent-[#060E57]"
+              />
+              <span class="text-sm font-medium text-gray-700">Female</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-sm font-bold text-gray-700"
+            >Grade Level / Occupation</label
           >
-            Cancel
-          </button>
-          <button
-            :disabled="!newSibling.fullName"
-            class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-            @click="handleAddSibling(data)"
+          <input
+            v-model="newSibling.gradeLevel"
+            type="text"
+            placeholder="e.g. Grade 10 or Working"
+            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#060E57] focus:outline-none focus:ring-1 focus:ring-[#060E57]"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-sm font-bold text-gray-700"
+            >School / Company</label
           >
-            Add Sibling
-          </button>
+          <input
+            v-model="newSibling.schoolAttended"
+            type="text"
+            placeholder="Name of school or workplace"
+            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#060E57] focus:outline-none focus:ring-1 focus:ring-[#060E57]"
+          />
         </div>
       </div>
-    </div>
+
+      <div class="mt-8 flex justify-end gap-3 border-t border-gray-100 pt-5">
+        <button
+          type="button"
+          class="rounded-lg px-5 py-2.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#060E57]"
+          @click="isDialogOpen = false"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          :disabled="!newSibling.fullName"
+          class="rounded-lg bg-[#060E57] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#060E57]/20 transition-all hover:bg-[#060E57]/90 disabled:cursor-not-allowed disabled:bg-gray-300"
+          @click="handleAddSibling(data)"
+        >
+          Add Sibling
+        </button>
+      </div>
+    </Modal>
   </div>
 </template>

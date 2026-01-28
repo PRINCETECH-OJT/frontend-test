@@ -19,7 +19,6 @@ const emit = defineEmits<{
   (e: "complete", applicationNumber: string): void;
 }>();
 
-// --- CONFIGURATION ---
 const STEPS = [
   {
     id: 1,
@@ -51,9 +50,8 @@ const STEPS = [
 
 const EXAMINATION_TYPES = ["Onsite", "Online"];
 
-// --- STATE ---
-const showExamSelection = ref(true); // Controls the "Landing Page" view
-const selectedExamType = ref("Onsite"); // Default value
+const showExamSelection = ref(true);
+const selectedExamType = ref("Onsite");
 
 const currentStep = ref(1);
 const formData = ref<ApplicationData>({ ...initialApplicationData });
@@ -61,16 +59,12 @@ const currentStepData = computed(() => STEPS[currentStep.value - 1]);
 const isSubmitting = ref(false);
 const errorMessage = ref("");
 
-// --- METHODS ---
 const handleExamSelectionNext = () => {
-  // Save the exam type to formData (ensure 'examType' exists in your ApplicationData type)
-  // If strict types prevent this, just use the separate ref for now.
   updateFormData({
     ...formData.value,
     examType: selectedExamType.value,
   } as any);
 
-  // Switch to the main form view
   showExamSelection.value = false;
   window.scrollTo(0, 0);
 };
@@ -91,7 +85,6 @@ const handlePrevious = () => {
     currentStep.value--;
     window.scrollTo(0, 0);
   } else {
-    // If on Step 1, go back to Exam Selection
     showExamSelection.value = true;
   }
 };
@@ -245,10 +238,14 @@ const handleSubmit = async () => {
                 v-for="step in STEPS"
                 :key="step.id"
                 class="group flex items-center gap-4 rounded-lg p-3 transition-all"
-                :class="step.id === currentStep ? 'bg-blue-50' : ''"
+                :class="
+                  step.id === currentStep
+                    ? 'bg-[#060E57]/5'
+                    : 'hover:bg-gray-50'
+                "
               >
                 <div
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold"
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors"
                   :class="[
                     step.id < currentStep
                       ? 'bg-[#2563EB] border-[#2563EB] text-white'
@@ -260,13 +257,14 @@ const handleSubmit = async () => {
                   <span v-if="step.id < currentStep">✓</span>
                   <span v-else>{{ step.id }}</span>
                 </div>
-                <div>
+
+                <div class="flex-1">
                   <p
-                    class="text-sm font-bold"
+                    class="text-sm font-bold leading-tight"
                     :class="
                       step.id === currentStep
                         ? 'text-[#2563EB]'
-                        : 'text-[#374151]'
+                        : 'text-gray-500'
                     "
                   >
                     {{ step.title }}

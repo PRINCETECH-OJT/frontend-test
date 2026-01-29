@@ -16,7 +16,7 @@ import {
   ArrowLeftOnRectangleIcon,
   ViewColumnsIcon,
   BuildingOfficeIcon,
-  RectangleGroupIcon,
+  BuildingOffice2Icon,
 } from "@heroicons/vue/24/outline";
 
 defineProps({
@@ -70,7 +70,7 @@ const menuItems = [
       {
         name: "Colleges",
         path: "/colleges",
-        icon: AcademicCapIcon,
+        icon: BuildingOffice2Icon,
         roles: ["admin", "super_admin"],
       },
       {
@@ -100,12 +100,11 @@ const menuItems = [
     roles: ["admin", "super_admin"],
   },
   {
-    name: "My Classes",
-    path: "/classes",
+    name: "Applicants",
+    path: "/applicants",
     icon: AcademicCapIcon,
-    roles: ["student", "instructor"],
+    roles: ["admin", "super_admin"],
   },
-  { name: "Schedule", path: "/schedule", icon: CalendarIcon, roles: ["all"] },
 ];
 
 const filteredMenuItems = computed(() => {

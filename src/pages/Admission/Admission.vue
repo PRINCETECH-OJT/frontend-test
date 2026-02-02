@@ -11,6 +11,7 @@ import EducationalBackgroundStep from "./steps/EducationalBackgroundStep.vue";
 import FamilyInfoStep from "./steps/FamilyInfoStep.vue";
 import OtherInfoStep from "./steps/OtherInfoStep.vue";
 import ReviewStep from "./steps/ReviewStep.vue";
+import ProgressSidebar from "../../components/progressSidebar.vue";
 import { submitAdmission } from "./services/admissionService";
 
 defineProps<{ applicationNumber: string | null }>();
@@ -52,12 +53,15 @@ const EXAMINATION_TYPES = ["Onsite", "Online"];
 
 const showExamSelection = ref(true);
 const selectedExamType = ref("Onsite");
-
 const currentStep = ref(1);
-const formData = ref<ApplicationData>({ ...initialApplicationData });
-const currentStepData = computed(() => STEPS[currentStep.value - 1]);
 const isSubmitting = ref(false);
 const errorMessage = ref("");
+
+const formData = ref<ApplicationData>({ ...initialApplicationData });
+
+const errors = ref<Record<string, string>>({});
+
+const currentStepData = computed(() => STEPS[currentStep.value - 1]);
 
 const handleExamSelectionNext = () => {
   updateFormData({
@@ -73,7 +77,138 @@ const updateFormData = (data: Partial<ApplicationData>) => {
   formData.value = { ...formData.value, ...data };
 };
 
+const validateStep1 = () => {
+  const newErrors: Record<string, string> = {};
+  let isValid = true;
+
+  if (!formData.value.campus) {
+    newErrors.campus = "Please select a school campus.";
+    isValid = false;
+  }
+  if (!formData.value.academicYear) {
+    newErrors.academicYear = "Academic year is required.";
+    isValid = false;
+  }
+  if (!formData.value.applicationType) {
+    newErrors.applicationType = "Application type is required.";
+    isValid = false;
+  }
+  if (!formData.value.firstChoiceProgram) {
+    newErrors.firstChoiceProgram = "Please select a priority program.";
+    isValid = false;
+  }
+
+  errors.value = newErrors;
+  return isValid;
+};
+
+const validateStep2 = () => {
+  const newErrors: Record<string, string> = {};
+  let isValid = true;
+
+  if (!formData.value.surname?.trim()) {
+    newErrors.surname = "Surname is required";
+    isValid = false;
+  }
+  if (!formData.value.givenName?.trim()) {
+    newErrors.givenName = "Given name is required";
+    isValid = false;
+  }
+  if (!formData.value.middleName?.trim()) {
+    newErrors.middleName = "Middle name is required";
+    isValid = false;
+  }
+  if (!formData.value.middleInitial?.trim()) {
+    newErrors.middleInitial = "Middle initial is required";
+    isValid = false;
+  }
+  if (!formData.value.dateOfBirth) {
+    newErrors.dateOfBirth = "Date of birth is required";
+    isValid = false;
+  }
+  if (!formData.value.placeOfBirth?.trim()) {
+    newErrors.placeOfBirth = "Place of birth is required";
+    isValid = false;
+  }
+  if (!formData.value.gender) {
+    newErrors.gender = "Gender is required";
+    isValid = false;
+  }
+  if (!formData.value.civilStatus) {
+    newErrors.civilStatus = "Civil status is required";
+    isValid = false;
+  }
+
+  if (!formData.value.houseStreet?.trim()) {
+    newErrors.houseStreet = "Address is required";
+    isValid = false;
+  }
+  if (!formData.value.province) {
+    newErrors.province = "Province is required";
+    isValid = false;
+  }
+  if (!formData.value.city?.trim()) {
+    newErrors.city = "City is required";
+    isValid = false;
+  }
+  if (!formData.value.barangay?.trim()) {
+    newErrors.barangay = "Barangay is required";
+    isValid = false;
+  }
+
+  if (!formData.value.nationality) {
+    newErrors.nationality = "Nationality is required";
+    isValid = false;
+  }
+  if (!formData.value.religion) {
+    newErrors.religion = "Religion is required";
+    isValid = false;
+  }
+  if (!formData.value.mobileNumber?.trim()) {
+    newErrors.mobileNumber = "Mobile number is required";
+    isValid = false;
+  }
+
+  if (!formData.value.email?.trim()) {
+    newErrors.email = "Email is required";
+    isValid = false;
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
+    newErrors.email = "Invalid email format";
+    isValid = false;
+  }
+
+  errors.value = newErrors;
+  return isValid;
+};
+
+const validateStep3 = () => {
+  const newErrors: Record:<string, string>;
+  let isValid = true
+
+  if (!formData.value.lrn?.trim()) {
+    newErrors.lrn = "LRN is required";
+    isValid = false;
+  }
+
+  
+  return isValid;
+}
+
 const handleNext = () => {
+  if (currentStep.value === 1) {
+    if (!validateStep1()) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+  } else if (currentStep.value === 2) {
+    if (!validateStep2()) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+  }
+
+  errors.value = {};
+
   if (currentStep.value < STEPS.length) {
     currentStep.value++;
     window.scrollTo(0, 0);
@@ -102,8 +237,8 @@ const handleSubmit = async () => {
   } catch (error: any) {
     console.error("Submission Error:", error);
     if (error.response && error.response.status === 422) {
-      const errors = error.response.data.errors;
-      const errorList = Object.values(errors).flat().join("\n");
+      const apiErrors = error.response.data.errors;
+      const errorList = Object.values(apiErrors).flat().join("\n");
       errorMessage.value = "Please fix the following errors:\n" + errorList;
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -217,62 +352,14 @@ const handleSubmit = async () => {
             </button>
           </div>
         </div>
-
         <p class="mt-8 text-xs font-medium text-gray-500">
           Powered by: Prince Technologies Corporation
         </p>
       </div>
 
-      <div v-else class="grid gap-8 lg:grid-cols-[300px_1fr]">
+      <div v-else class="grid gap-8 lg:grid-cols-[250px_1fr]">
         <aside class="hidden lg:block">
-          <div
-            class="sticky top-24 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
-          >
-            <h2
-              class="mb-6 text-sm font-bold uppercase tracking-wider text-gray-500"
-            >
-              Progress
-            </h2>
-            <nav class="space-y-2">
-              <div
-                v-for="step in STEPS"
-                :key="step.id"
-                class="group flex items-center gap-4 rounded-lg p-3 transition-all"
-                :class="
-                  step.id === currentStep
-                    ? 'bg-[#060E57]/5'
-                    : 'hover:bg-gray-50'
-                "
-              >
-                <div
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors"
-                  :class="[
-                    step.id < currentStep
-                      ? 'bg-[#2563EB] border-[#2563EB] text-white'
-                      : step.id === currentStep
-                        ? 'border-[#2563EB] text-[#2563EB]'
-                        : 'border-gray-200 text-gray-300',
-                  ]"
-                >
-                  <span v-if="step.id < currentStep">✓</span>
-                  <span v-else>{{ step.id }}</span>
-                </div>
-
-                <div class="flex-1">
-                  <p
-                    class="text-sm font-bold leading-tight"
-                    :class="
-                      step.id === currentStep
-                        ? 'text-[#2563EB]'
-                        : 'text-gray-500'
-                    "
-                  >
-                    {{ step.title }}
-                  </p>
-                </div>
-              </div>
-            </nav>
-          </div>
+          <ProgressSidebar :steps="STEPS" :current-step="currentStep" />
         </aside>
 
         <main class="space-y-6">
@@ -297,11 +384,14 @@ const handleSubmit = async () => {
               <ApplicationDetailsStep
                 v-if="currentStep === 1"
                 :data="formData"
+                :errors="errors"
                 @update="updateFormData"
               />
+
               <PersonalInfoStep
                 v-else-if="currentStep === 2"
                 :data="formData"
+                :errors="errors"
                 @update="updateFormData"
               />
               <EducationalBackgroundStep

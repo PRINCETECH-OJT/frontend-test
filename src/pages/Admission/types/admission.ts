@@ -157,6 +157,50 @@ export interface Document {
   remarks: string;
 }
 
+export interface SchoolHistory {
+  id: string;
+  schoolName: string;
+  address: string;
+  programStrand: string;
+  yearOfGraduation: string;
+  gwa: string;
+  award: string;
+  lastGradeLevel: string;
+  isPrivate: boolean;
+  isForeign: boolean;
+}
+
+export const CIVIL_STATUS = ["Single", "Married", "Separated", "Widow/er"];
+export const SPORTS = [
+  "None",
+  "Basketball",
+  "Volleyball",
+  "Badminton",
+  "Swimming",
+  "Soccer",
+  "Chess",
+  "Table Tennis",
+  "Others",
+];
+export const ARTS = [
+  "None",
+  "Dance",
+  "Visual",
+  "Vocal Music",
+  "Instrumental Music",
+  "Theatre",
+  "Others",
+];
+export const TECHNICAL = [
+  "None",
+  "Computer Programming",
+  "Web Development",
+  "Graphic Design",
+  "Electronics",
+  "Automotive",
+  "Others",
+];
+
 export const CAMPUSES = [
   "USTP-CDO",
   "USTP ALUBIJID",

@@ -5,6 +5,10 @@ import {
   RELIGIONS,
   PROVINCES,
   VACCINATION_STATUS,
+  CIVIL_STATUS,
+  SPORTS,
+  ARTS,
+  TECHNICAL,
 } from "../types/admission";
 
 import Input from "../../../components/ui/input.vue";
@@ -13,6 +17,7 @@ import Button from "../../../components/ui/button.vue";
 
 defineProps<{
   data: ApplicationData;
+  errors: Record<string, string>;
 }>();
 
 const emit = defineEmits<{
@@ -24,37 +29,6 @@ const emit = defineEmits<{
 const updateField = (field: keyof ApplicationData, value: any) => {
   emit("update", { [field]: value });
 };
-
-const CIVIL_STATUS_OPTIONS = ["Single", "Married", "Separated", "Widow/er"];
-const SPORTS_OPTIONS = [
-  "None",
-  "Basketball",
-  "Volleyball",
-  "Badminton",
-  "Swimming",
-  "Soccer",
-  "Chess",
-  "Table Tennis",
-  "Others",
-];
-const ARTS_OPTIONS = [
-  "None",
-  "Dance",
-  "Visual",
-  "Vocal Music",
-  "Instrumental Music",
-  "Theatre",
-  "Others",
-];
-const TECHNICAL_OPTIONS = [
-  "None",
-  "Computer Programming",
-  "Web Development",
-  "Graphic Design",
-  "Electronics",
-  "Automotive",
-  "Others",
-];
 </script>
 
 <template>
@@ -66,9 +40,12 @@ const TECHNICAL_OPTIONS = [
 
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div class="space-y-2">
-          <label class="text-sm font-medium text-foreground">Surname *</label>
+          <label class="text-sm font-medium text-foreground"
+            >Surname <span class="text-red-500">*</span></label
+          >
           <Input
             :model-value="data.surname"
+            :error="errors.surname"
             placeholder="Last name"
             @update:model-value="(v) => updateField('surname', v)"
           />
@@ -76,10 +53,11 @@ const TECHNICAL_OPTIONS = [
 
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >Given Name *</label
+            >Given Name <span class="text-red-500">*</span></label
           >
           <Input
             :model-value="data.givenName"
+            :error="errors.givenName"
             placeholder="First name"
             @update:model-value="(v) => updateField('givenName', v)"
           />
@@ -89,6 +67,7 @@ const TECHNICAL_OPTIONS = [
           <label class="text-sm font-medium text-foreground">Middle Name</label>
           <Input
             :model-value="data.middleName"
+            :error="errors.middleName"
             placeholder="Middle name"
             @update:model-value="(v) => updateField('middleName', v)"
           />
@@ -99,6 +78,7 @@ const TECHNICAL_OPTIONS = [
             <label class="text-sm font-medium text-foreground">M.I.</label>
             <Input
               :model-value="data.middleInitial"
+              :error="errors.middleInitial"
               maxlength="2"
               @update:model-value="(v) => updateField('middleInitial', v)"
             />
@@ -117,28 +97,32 @@ const TECHNICAL_OPTIONS = [
       <div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >Date of Birth *</label
+            >Date of Birth <span class="text-red-500">*</span></label
           >
           <Input
             type="date"
             :model-value="data.dateOfBirth"
+            :error="errors.dateOfBirth"
             @update:model-value="(v) => updateField('dateOfBirth', v)"
           />
         </div>
 
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >Place of Birth *</label
+            >Place of Birth <span class="text-red-500">*</span></label
           >
           <Input
             :model-value="data.placeOfBirth"
+            :error="errors.placeOfBirth"
             placeholder="City, Province"
             @update:model-value="(v) => updateField('placeOfBirth', v)"
           />
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium text-foreground">Gender *</label>
+          <label class="text-sm font-medium text-foreground"
+            >Gender <span class="text-red-500">*</span></label
+          >
           <div class="flex gap-4 pt-2">
             <label class="flex items-center space-x-2 cursor-pointer">
               <input
@@ -167,11 +151,12 @@ const TECHNICAL_OPTIONS = [
 
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >Civil Status *</label
+            >Civil Status <span class="text-red-500">*</span></label
           >
           <Dropdown
-            :options="CIVIL_STATUS_OPTIONS"
+            :options="CIVIL_STATUS"
             :model-value="data.civilStatus"
+            :error="errors.civilStatus"
             placeholder="Select Status"
             @update:model-value="(v) => updateField('civilStatus', v)"
           />
@@ -187,10 +172,11 @@ const TECHNICAL_OPTIONS = [
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-foreground"
-            >House No., Street Name *</label
+            >House No., Street Name <span class="text-red-500">*</span></label
           >
           <Input
             :model-value="data.houseStreet"
+            :error="errors.houseStreet"
             placeholder="Enter complete address"
             @update:model-value="(v) => updateField('houseStreet', v)"
           />
@@ -198,11 +184,12 @@ const TECHNICAL_OPTIONS = [
 
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >Province/Region *</label
+            >Province/Region <span class="text-red-500">*</span></label
           >
           <Dropdown
             :options="PROVINCES"
             :model-value="data.province"
+            :error="errors.province"
             placeholder="Select Province"
             @update:model-value="(v) => updateField('province', v)"
           />
@@ -210,19 +197,23 @@ const TECHNICAL_OPTIONS = [
 
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >City/Municipality *</label
+            >City/Municipality <span class="text-red-500">*</span></label
           >
           <Input
             :model-value="data.city"
+            :error="errors.city"
             placeholder="Enter city"
             @update:model-value="(v) => updateField('city', v)"
           />
         </div>
 
         <div class="space-y-2 md:col-span-2">
-          <label class="text-sm font-medium text-foreground">Barangay *</label>
+          <label class="text-sm font-medium text-foreground"
+            >Barangay <span class="text-red-500">*</span></label
+          >
           <Input
             :model-value="data.barangay"
+            :error="errors.barangay"
             placeholder="Enter barangay"
             @update:model-value="(v) => updateField('barangay', v)"
           />
@@ -238,21 +229,25 @@ const TECHNICAL_OPTIONS = [
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >Nationality *</label
+            >Nationality <span class="text-red-500">*</span></label
           >
           <Dropdown
             :options="NATIONALITIES"
             :model-value="data.nationality"
+            :error="errors.nationality"
             placeholder="Select Nationality"
             @update:model-value="(v) => updateField('nationality', v)"
           />
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium text-foreground">Religion *</label>
+          <label class="text-sm font-medium text-foreground"
+            >Religion <span class="text-red-500">*</span></label
+          >
           <Dropdown
             :options="RELIGIONS"
             :model-value="data.religion"
+            :error="errors.religion"
             placeholder="Select Religion"
             @update:model-value="(v) => updateField('religion', v)"
           />
@@ -283,21 +278,25 @@ const TECHNICAL_OPTIONS = [
 
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground"
-            >Mobile Number *</label
+            >Mobile Number <span class="text-red-500">*</span></label
           >
           <Input
             type="tel"
             :model-value="data.mobileNumber"
+            :error="errors.mobileNumber"
             placeholder="+63 9XX XXX XXXX"
             @update:model-value="(v) => updateField('mobileNumber', v)"
           />
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium text-foreground">Email *</label>
+          <label class="text-sm font-medium text-foreground"
+            >Email <span class="text-red-500">*</span></label
+          >
           <Input
             type="email"
             :model-value="data.email"
+            :error="errors.email"
             placeholder="example@gmail.com"
             @update:model-value="(v) => updateField('email', v)"
           />
@@ -461,7 +460,7 @@ const TECHNICAL_OPTIONS = [
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground">Sports</label>
           <Dropdown
-            :options="SPORTS_OPTIONS"
+            :options="SPORTS"
             :model-value="data.sports"
             placeholder="Select Sport"
             @update:model-value="(v) => updateField('sports', v)"
@@ -471,7 +470,7 @@ const TECHNICAL_OPTIONS = [
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground">Arts</label>
           <Dropdown
-            :options="ARTS_OPTIONS"
+            :options="ARTS"
             :model-value="data.arts"
             placeholder="Select Art"
             @update:model-value="(v) => updateField('arts', v)"
@@ -481,7 +480,7 @@ const TECHNICAL_OPTIONS = [
         <div class="space-y-2">
           <label class="text-sm font-medium text-foreground">Technical</label>
           <Dropdown
-            :options="TECHNICAL_OPTIONS"
+            :options="TECHNICAL"
             :model-value="data.technical"
             placeholder="Select Technical Skill"
             @update:model-value="(v) => updateField('technical', v)"

@@ -9,14 +9,20 @@ import {
   PROGRAMS,
   MAJORS,
 } from "../types/admission";
+import Dropdown from "../../../components/ui/dropdown.vue";
 
 defineProps<{
   data: ApplicationData;
+  errors: Record<string, string>;
 }>();
 
 const emit = defineEmits<{
   (e: "update", data: Partial<ApplicationData>): void;
 }>();
+
+const updateField = (field: keyof ApplicationData, value: string) => {
+  emit("update", { [field]: value });
+};
 </script>
 
 <template>
@@ -54,24 +60,18 @@ const emit = defineEmits<{
             for="campus"
             class="text-xs font-bold uppercase tracking-wider text-gray-500"
           >
-            School Campus <span class="text-red-500">*</span>
           </label>
           <div class="relative">
-            <select
+            <Dropdown
               id="campus"
-              :value="data.campus"
-              class="w-full appearance-none rounded-lg border border-gray-300 bg-gray-50/50 px-4 py-3 text-sm font-medium text-gray-900 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
-              @change="
-                emit('update', {
-                  campus: ($event.target as HTMLSelectElement).value,
-                })
-              "
-            >
-              <option value="" disabled selected>Select a Campus</option>
-              <option v-for="campus in CAMPUSES" :key="campus" :value="campus">
-                {{ campus }}
-              </option>
-            </select>
+              label="School Campus"
+              placeholder="Select a Campus"
+              :options="CAMPUSES"
+              :model-value="data.campus"
+              :error="errors.campus"
+              required
+              @update:model-value="updateField('campus', $event)"
+            />
             <div
               class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
             >
@@ -97,23 +97,18 @@ const emit = defineEmits<{
             for="academicYear"
             class="text-xs font-bold uppercase tracking-wider text-gray-500"
           >
-            Academic Year <span class="text-red-500">*</span>
           </label>
           <div class="relative">
-            <select
+            <Dropdown
               id="academicYear"
-              :value="data.academicYear"
-              class="w-full appearance-none rounded-lg border border-gray-300 bg-gray-50/50 px-4 py-3 text-sm font-medium text-gray-900 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
-              @change="
-                emit('update', {
-                  academicYear: ($event.target as HTMLSelectElement).value,
-                })
-              "
-            >
-              <option v-for="year in ACADEMIC_YEARS" :key="year" :value="year">
-                {{ year }}
-              </option>
-            </select>
+              label="Academic Year"
+              placeholder="Select Year"
+              :options="ACADEMIC_YEARS"
+              :model-value="data.academicYear"
+              :error="errors.academicYear"
+              required
+              @update:model-value="updateField('academicYear', $event)"
+            />
             <div
               class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
             >
@@ -139,27 +134,18 @@ const emit = defineEmits<{
             for="applicationType"
             class="text-xs font-bold uppercase tracking-wider text-gray-500"
           >
-            Application Type <span class="text-red-500">*</span>
           </label>
           <div class="relative">
-            <select
+            <Dropdown
               id="applicationType"
-              :value="data.applicationType"
-              class="w-full appearance-none rounded-lg border border-gray-300 bg-gray-50/50 px-4 py-3 text-sm font-medium text-gray-900 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
-              @change="
-                emit('update', {
-                  applicationType: ($event.target as HTMLSelectElement).value,
-                })
-              "
-            >
-              <option
-                v-for="type in APPLICATION_TYPES"
-                :key="type"
-                :value="type"
-              >
-                {{ type }}
-              </option>
-            </select>
+              label="Application Type"
+              placeholder="Select Type"
+              :options="APPLICATION_TYPES"
+              :model-value="data.applicationType"
+              :error="errors.applicationType"
+              required
+              @update:model-value="updateField('applicationType', $event)"
+            />
             <div
               class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
             >
@@ -229,28 +215,16 @@ const emit = defineEmits<{
 
             <div class="w-full">
               <div class="relative">
-                <select
+                <Dropdown
                   id="firstProgram"
-                  :value="data.firstChoiceProgram"
-                  class="w-full appearance-none rounded-lg border border-blue-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
-                  @change="
-                    emit('update', {
-                      firstChoiceProgram: ($event.target as HTMLSelectElement)
-                        .value,
-                    })
+                  placeholder="Select First Priority Program"
+                  :options="PROGRAMS"
+                  :model-value="data.firstChoiceProgram"
+                  :error="errors.firstChoiceProgram"
+                  @update:model-value="
+                    updateField('firstChoiceProgram', $event)
                   "
-                >
-                  <option value="" disabled selected>
-                    Select First Priority Program
-                  </option>
-                  <option
-                    v-for="program in PROGRAMS"
-                    :key="program"
-                    :value="program"
-                  >
-                    {{ program }}
-                  </option>
-                </select>
+                />
                 <div
                   class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
                 >
@@ -289,28 +263,15 @@ const emit = defineEmits<{
             </div>
             <div class="w-full">
               <div class="relative">
-                <select
+                <Dropdown
                   id="secondProgram"
-                  :value="data.secondChoiceProgram"
-                  class="w-full appearance-none rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-colors focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-purple-500/10"
-                  @change="
-                    emit('update', {
-                      secondChoiceProgram: ($event.target as HTMLSelectElement)
-                        .value,
-                    })
+                  placeholder="Select Alternative (Optional)"
+                  :options="PROGRAMS"
+                  :model-value="data.secondChoiceProgram"
+                  @update:model-value="
+                    updateField('secondChoiceProgram', $event)
                   "
-                >
-                  <option value="" disabled selected>
-                    Select Alternative Program (Optional)
-                  </option>
-                  <option
-                    v-for="program in PROGRAMS"
-                    :key="program"
-                    :value="program"
-                  >
-                    {{ program }}
-                  </option>
-                </select>
+                />
                 <div
                   class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
                 >
@@ -349,28 +310,15 @@ const emit = defineEmits<{
             </div>
             <div class="w-full">
               <div class="relative">
-                <select
+                <Dropdown
                   id="thirdProgram"
-                  :value="data.thirdChoiceProgram"
-                  class="w-full appearance-none rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition-colors focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-purple-500/10"
-                  @change="
-                    emit('update', {
-                      thirdChoiceProgram: ($event.target as HTMLSelectElement)
-                        .value,
-                    })
+                  placeholder="Select Alternative (Optional)"
+                  :options="PROGRAMS"
+                  :model-value="data.thirdChoiceProgram"
+                  @update:model-value="
+                    updateField('thirdChoiceProgram', $event)
                   "
-                >
-                  <option value="" disabled selected>
-                    Select Alternative Program (Optional)
-                  </option>
-                  <option
-                    v-for="program in PROGRAMS"
-                    :key="program"
-                    :value="program"
-                  >
-                    {{ program }}
-                  </option>
-                </select>
+                />
                 <div
                   class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
                 >
